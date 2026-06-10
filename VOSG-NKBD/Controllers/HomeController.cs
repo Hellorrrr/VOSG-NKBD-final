@@ -35,6 +35,21 @@ namespace VOSG_NKBD.Controllers
             return View(await locations.ToListAsync());
         }
 
+        public async Task<IActionResult> City(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
+
+            var locations = await _context.Locations
+                .Include(l => l.Places)
+                .Where(l => l.City == id)
+                .ToListAsync();
+
+            if (!locations.Any()) return RedirectToAction("Index");
+
+            ViewBag.CityName = id;
+            return View(locations);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() =>
             View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

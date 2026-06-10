@@ -1,0 +1,540 @@
+﻿@model IEnumerable<VOSG_NKBD.Models.Location>
+@{
+    ViewData["Title"] = ViewBag.CityName;
+    var cityName = (string)ViewBag.CityName;
+
+    var cityData = new Dictionary<string, (string img, string tagline, string sub)>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Auckland"] = ("/images/auckland-city.jpg", "AUCKLAND", "Auckland is the largest city in New Zealand and is often called the \"City of Sails\""),
+        ["Toronto"] = ("/images/toronto-city.jpg", "TORONTO", "Toronto is Canada's most vibrant metropolis, a city of towers and waterfront wonder"),
+        ["Orlando"] = ("/images/orlando-city.jpg", "ORLANDO", "Orlando is the entertainment capital of the world, where imagination never sleeps"),
+        ["Melbourne"] = ("/images/melbourne-city.jpg", "MELBOURNE", "Melbourne is Australia's cultural heartbeat, celebrated for its art, coffee, and creativity"),
+        ["Helsinki"] = ("/images/helsinki-city.jpg", "HELSINKI", "Helsinki is a Nordic gem of design and nature, where the Baltic Sea meets the sky"),
+    };
+
+    var (heroImg, heroTitle, heroSub) = cityData.TryGetValue(cityName, out var d)
+        ? d : ("/images/auckland-city.jpg", cityName.ToUpper(), "Discover stunning venues in " + cityName);
+}
+
+<style>
+    body {
+        background: #000;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%) !important;
+        box-shadow: none !important;
+        transition: background 0.4s;
+    }
+
+        .navbar.scrolled {
+            background: rgba(0,0,0,0.85) !important;
+            backdrop-filter: blur(18px) !important;
+        }
+
+        .navbar .navbar-brand, .navbar .nav-right a,
+        .navbar .btn-login {
+            color: #fff !important;
+        }
+
+            .navbar .nav-right a:hover {
+                color: rgba(255,255,255,0.7) !important;
+            }
+
+    .city-hero {
+        position: relative;
+        height: 100vh;
+        min-height: 600px;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        padding-bottom: 8vh;
+    }
+
+    .city-hero__bg {
+        position: absolute;
+        inset: 0;
+        background: center/cover no-repeat;
+        transform: scale(1.08);
+        transition: transform 8s ease-out;
+        will-change: transform;
+    }
+
+        .city-hero__bg.loaded {
+            transform: scale(1);
+        }
+
+    .city-hero__overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.72) 80%, rgba(0,0,0,0.88) 100%);
+    }
+
+    .city-hero__content {
+        position: relative;
+        z-index: 2;
+        padding: 0 5vw;
+        width: 100%;
+    }
+
+    .city-hero__eyebrow {
+        font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+        font-weight: 600;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 0.4rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.7s 0.2s, transform 0.7s 0.2s;
+    }
+
+    .city-hero__title {
+        font-size: clamp(4rem, 13vw, 13rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 0.88;
+        color: #fff;
+        margin: 0 0 1.2rem;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s 0.35s, transform 0.8s 0.35s;
+        text-shadow: 0 4px 40px rgba(0,0,0,0.3);
+    }
+
+    .city-hero__sub {
+        font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+        color: rgba(255,255,255,0.82);
+        max-width: 540px;
+        line-height: 1.55;
+        font-weight: 400;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.7s 0.55s, transform 0.7s 0.55s;
+        margin-bottom: 2rem;
+    }
+
+    .city-hero__cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: #fff !important;
+        padding: 0.7rem 1.6rem;
+        border-radius: 50px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-decoration: none !important;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.7s 0.7s, transform 0.7s 0.7s, background 0.2s;
+    }
+
+        .city-hero__cta:hover {
+            background: rgba(255,255,255,0.28);
+            color: #fff !important;
+        }
+
+    .city-hero__scroll-hint {
+        position: absolute;
+        bottom: 2.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        color: rgba(255,255,255,0.5);
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        z-index: 2;
+        animation: bounce 2.2s infinite;
+    }
+
+        .city-hero__scroll-hint svg {
+            opacity: 0.5;
+        }
+
+    @@keyframes bounce {
+        0%, 100% {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        50% {
+            transform: translateX(-50%) translateY(6px);
+        }
+    }
+
+    .hero-ready .city-hero__eyebrow,
+    .hero-ready .city-hero__title,
+    .hero-ready .city-hero__sub,
+    .hero-ready .city-hero__cta {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .venues-section {
+        background: #0a0a0a;
+        padding: 5rem 0 6rem;
+    }
+
+    .venues-section__header {
+        text-align: center;
+        margin-bottom: 3.5rem;
+    }
+
+    .venues-section__label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #38B2AC;
+        margin-bottom: 0.6rem;
+    }
+
+    .venues-section__title {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+    }
+
+        .venues-section__title span {
+            color: #38B2AC;
+        }
+
+    .venue-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .venue-card {
+        background: #161616;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.06);
+        transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s, border-color 0.35s;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+        .venue-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s, border-color 0.35s;
+        }
+
+        .venue-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+            border-color: rgba(56,178,172,0.25);
+        }
+
+    .venue-card__img {
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+    }
+
+        .venue-card__img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+    .venue-card:hover .venue-card__img img {
+        transform: scale(1.06);
+    }
+
+    .venue-card__body {
+        padding: 1.4rem 1.5rem;
+    }
+
+    .venue-card__tag {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #38B2AC;
+        margin-bottom: 0.5rem;
+    }
+
+    .venue-card__name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.3rem;
+    }
+
+    .venue-card__desc {
+        font-size: 0.88rem;
+        color: rgba(255,255,255,0.45);
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .venue-card__price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 1.2rem;
+    }
+
+        .venue-card__price span {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.4);
+        }
+
+    .venue-card__actions {
+        display: flex;
+        gap: 0.6rem;
+    }
+
+    .btn-apple {
+        flex: 1;
+        padding: 0.65rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none !important;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-apple-primary {
+        background: #38B2AC;
+        color: #000 !important;
+    }
+
+        .btn-apple-primary:hover {
+            background: #2C9A94;
+            color: #000 !important;
+        }
+
+    .btn-apple-ghost {
+        background: rgba(255,255,255,0.08);
+        color: #fff !important;
+        border: 1px solid rgba(255,255,255,0.12);
+    }
+
+        .btn-apple-ghost:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff !important;
+        }
+
+    .back-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: rgba(255,255,255,0.7) !important;
+        font-size: 0.85rem;
+        text-decoration: none !important;
+        margin-bottom: 3rem;
+        transition: color 0.2s;
+    }
+
+        .back-pill:hover {
+            color: #fff !important;
+        }
+
+    .city-stats {
+        display: flex;
+        justify-content: center;
+        gap: 4rem;
+        padding: 2.5rem 0;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        max-width: 1200px;
+        margin: 0 auto 3.5rem;
+    }
+
+    .city-stat {
+        text-align: center;
+    }
+
+    .city-stat__num {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.02em;
+    }
+
+        .city-stat__num span {
+            color: #38B2AC;
+        }
+
+    .city-stat__label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+        margin-top: 0.2rem;
+    }
+
+    @@media (max-width: 600px) {
+        .city-hero__title {
+            font-size: clamp(3.5rem, 20vw, 6rem);
+        }
+
+        .city-stats {
+            gap: 2rem;
+        }
+
+        .venue-grid {
+            grid-template-columns: 1fr;
+            padding: 0 1rem;
+        }
+    }
+</style>
+
+<div class="city-hero" id="cityHero">
+    <div class="city-hero__bg" id="heroBg"></div>
+    <div class="city-hero__overlay"></div>
+    <div class="city-hero__content">
+        <p class="city-hero__eyebrow">VOSG · VENUE GUIDE</p>
+        <h1 class="city-hero__title">@heroTitle</h1>
+        <p class="city-hero__sub">@heroSub</p>
+        <a href="#venues" class="city-hero__cta">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 12.5A5.5 5.5 0 1 1 8 2.5a5.5 5.5 0 0 1 0 11zM7.25 5v3.44L5.03 9.72l.75 1.3 2.72-1.57V5H7.25z" />
+            </svg>
+            Explore Venues
+        </a>
+    </div>
+    <div class="city-hero__scroll-hint">
+        <span>Scroll</span>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 12L2 6l1.4-1.4L8 9.2l4.6-4.6L14 6z" />
+        </svg>
+    </div>
+</div>
+
+<div class="venues-section" id="venues">
+    @{
+        var totalPlaces = Model.Sum(l => l.Places?.Count ?? 0);
+        var minPrice = Model.SelectMany(l => l.Places ?? new List<VOSG_NKBD.Models.Place>())
+                            .Select(p => p.Price).DefaultIfEmpty(0).Min();
+    }
+    <div class="city-stats">
+        <div class="city-stat">
+            <div class="city-stat__num">@Model.Count()<span>+</span></div>
+            <div class="city-stat__label">Venues</div>
+        </div>
+        <div class="city-stat">
+            <div class="city-stat__num">@totalPlaces<span>+</span></div>
+            <div class="city-stat__label">Spaces</div>
+        </div>
+        <div class="city-stat">
+            <div class="city-stat__num"><span>$</span>@minPrice.ToString("N0")</div>
+            <div class="city-stat__label">From (NZD)</div>
+        </div>
+    </div>
+
+    <div style="max-width:1200px;margin:0 auto;padding:0 2rem;margin-bottom:2rem;">
+        <a asp-controller="Home" asp-action="Index" class="back-pill">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15 8H2.41l4.3-4.3-1.42-1.4-6 6a1 1 0 0 0 0 1.4l6 6 1.42-1.4L2.41 10H15V8z" />
+            </svg>
+            All Locations
+        </a>
+    </div>
+
+    <div class="venues-section__header">
+        <div class="venues-section__label">@cityName · @(Model.FirstOrDefault()?.Country ?? "")</div>
+        <h2 class="venues-section__title">Available <span>Venues</span></h2>
+    </div>
+
+    <div class="venue-grid">
+        @foreach (var loc in Model)
+        {
+            foreach (var place in loc.Places ?? new List<VOSG_NKBD.Models.Place>())
+            {
+                <div class="venue-card" data-reveal>
+                    <div class="venue-card__img">
+                        <img src="@(place.ImageUrl ?? "/images/auckland-city.jpg")"
+                             alt="@place.PlaceName" loading="lazy" />
+                    </div>
+                    <div class="venue-card__body">
+                        <div class="venue-card__tag">@loc.LocationName</div>
+                        <div class="venue-card__name">@place.PlaceName</div>
+                        <div class="venue-card__desc">@(place.Description ?? "A premium venue space ready for your event.")</div>
+                        <div class="venue-card__price">
+                            $@place.Price.ToString("N0") <span>NZD / session</span>
+                        </div>
+                        <div class="venue-card__actions">
+                            <a asp-controller="Confirmations" asp-action="Book"
+                               asp-route-id="@place.PlaceID"
+                               class="btn-apple btn-apple-primary">Book Now</a>
+                            <a asp-controller="Locations" asp-action="Details"
+                               asp-route-id="@loc.LocationsID"
+                               class="btn-apple btn-apple-ghost">Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var hero = document.getElementById('cityHero');
+            var bg   = document.getElementById('heroBg');
+
+            bg.style.backgroundImage = "url('@heroImg')";
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    bg.classList.add('loaded');
+                    hero.classList.add('hero-ready');
+                });
+            });
+
+            var navbar = document.querySelector('.navbar');
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 60) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            }, { passive: true });
+
+            document.querySelector('.city-hero__cta').addEventListener('click', function (e) {
+                var target = document.getElementById('venues');
+                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+            });
+
+            var cards = document.querySelectorAll('[data-reveal]');
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            var el = entry.target;
+                            var delay = (Array.from(cards).indexOf(el) % 3) * 120;
+                            setTimeout(function () { el.classList.add('visible'); }, delay);
+                            io.unobserve(el);
+                        }
+                    });
+                }, { threshold: 0.12 });
+                cards.forEach(function (c) { io.observe(c); });
+            } else {
+                cards.forEach(function (c) { c.classList.add('visible'); });
+            }
+        })();
+    </script>
+}

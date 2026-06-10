@@ -21,8 +21,8 @@
                class="filter-pill @(ViewBag.City == null && ViewBag.Search == null ? "active" : "")">All</a>
             @foreach (var city in cities)
             {
-                <a href="@Url.Action("Index", new { city })"
-                   class="filter-pill @(ViewBag.City == city ? "active" : "")">@city</a>
+                <a href="@Url.Action("City", "Home", new { id = city })"
+                   class="filter-pill">@city</a>
             }
         </div>
     </div>
