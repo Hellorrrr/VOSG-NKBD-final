@@ -1,0 +1,65 @@
+﻿@model VOSG_NKBD.Models.Location
+@{
+    ViewData["Title"] = "New Location";
+}
+
+<div class="container py-4" style="max-width:640px;">
+    <div class="vosg-card">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h2 class="section-title mb-0">➕ New <span>Location</span></h2>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label asp-for="LocationName" class="form-label"></label>
+                    <input asp-for="LocationName" class="form-control" placeholder="e.g. Auckland Showgrounds" />
+                    <span asp-validation-for="LocationName" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Address" class="form-label"></label>
+                    <input asp-for="Address" class="form-control" placeholder="e.g. 217 Green Lane West" />
+                    <span asp-validation-for="Address" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Suburb" class="form-label"></label>
+                    <input asp-for="Suburb" class="form-control" />
+                    <span asp-validation-for="Suburb" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="City" class="form-label"></label>
+                    <input asp-for="City" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Country" class="form-label"></label>
+                    <input asp-for="Country" class="form-control" />
+                    <span asp-validation-for="Country" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="PostalCode" class="form-label"></label>
+                    <input asp-for="PostalCode" class="form-control" />
+                    <span asp-validation-for="PostalCode" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="+64…" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-plus-circle me-1"></i>Create Location
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

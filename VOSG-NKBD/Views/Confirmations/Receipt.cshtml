@@ -1,0 +1,29 @@
+﻿@model VOSG_NKBD.Models.Confirmation
+@{
+    ViewData["Title"] = "Booking Confirmed!";
+}
+
+<div class="container py-5" style="max-width:560px;">
+    <div class="vosg-card text-center">
+        <div style="font-size:3.5rem; margin-bottom:0.5rem;">🎉</div>
+        <h2 class="text-success fw-bold">Booking Confirmed!</h2>
+        <p class="text-muted mb-4">Thank you! Your venue is booked and payment received.</p>
+        <div class="booking-summary text-start">
+            <div class="summary-row"><span>Location</span><strong>@Model.Place?.Location?.LocationName</strong></div>
+            <div class="summary-row"><span>Section</span><strong>@Model.Place?.PlaceName</strong></div>
+            <div class="summary-row"><span>Start</span><strong>@Model.StartTime.ToString("ddd dd MMM yyyy, HH:mm")</strong></div>
+            <div class="summary-row"><span>End</span><strong>@Model.EndTime.ToString("ddd dd MMM yyyy, HH:mm")</strong></div>
+            <div class="summary-row"><span>Booking ID</span><strong>#@Model.ConfirmationID</strong></div>
+            <div class="summary-row"><span>Payment</span><span class="badge-paid">@Model.Payment?.PaymentStatus</span></div>
+            <div class="summary-row summary-total"><span>Total Paid</span><strong>$@Model.TotalPrice.ToString("N2") NZD</strong></div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <a asp-action="Index" class="btn btn-outline-primary flex-fill">
+                <i class="bi bi-calendar-check me-1"></i>My Bookings
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary flex-fill">
+                <i class="bi bi-house me-1"></i>Home
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+﻿@model IEnumerable<VOSG_NKBD.Models.Location>
+@{
+    ViewData["Title"] = "Home";
+    var cities = ViewBag.Cities as List<string> ?? new List<string>();
+    var featured = ViewBag.Featured as List<VOSG_NKBD.Models.Location> ?? new List<VOSG_NKBD.Models.Location>();
+}
+
+<div class="hero">
+    <div class="container">
+        <h1>Find &amp; Book Your Perfect Venue</h1>
+        <p>Discover world-class event locations and reserve in minutes</p>
+        <form method="get" asp-action="Index">
+            <div class="search-bar">
+                <input type="text" name="search" value="@ViewBag.Search"
+                       placeholder="Search by venue name or city…" />
+                <button type="submit"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+        <div class="quick-filters mt-3">
+            <a href="@Url.Action("Index")"
+               class="filter-pill @(ViewBag.City == null && ViewBag.Search == null ? "active" : "")">All</a>
+            @foreach (var city in cities)
+            {
+                <a href="@Url.Action("Index", new { city })"
+                   class="filter-pill @(ViewBag.City == city ? "active" : "")">@city</a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h2 class="section-title">⭐ Featured <span>Locations</span></h2>
+    <div class="row g-4">
+        @foreach (var loc in featured)
+        {
+            var imgSrc = loc.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
+            <div class="col-sm-6 col-lg-4">
+                <div class="loc-card">
+                    <div class="loc-card-img">
+                        <img src="@imgSrc" alt="@loc.LocationName" />
+                    </div>
+                    <div class="loc-card-body">
+                        <div class="loc-card-title">@loc.LocationName</div>
+                        <div class="loc-card-sub"><i class="bi bi-geo-alt me-1"></i>@loc.City, @loc.Country</div>
+                        @if (loc.Places?.Any() == true)
+                        {
+                            <div class="loc-card-price">
+                                From $@loc.Places!.Min(p => p.Price).ToString("N0") NZD
+                            </div>
+                        }
+                        <div class="loc-card-footer">
+                            <a asp-controller="Locations" asp-action="Details" asp-route-id="@loc.LocationsID"
+                               class="btn btn-outline-primary btn-sm flex-fill">
+                                <i class="bi bi-info-circle me-1"></i>View Details
+                            </a>
+                            @if (loc.Places?.Any() == true)
+                            {
+                                <a asp-controller="Confirmations" asp-action="Book"
+                                   asp-route-id="@loc.Places!.First().PlaceID"
+                                   class="btn btn-primary btn-sm flex-fill">
+                                    <i class="bi bi-calendar-plus me-1"></i>Book
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (ViewBag.Search != null || ViewBag.City != null)
+{
+    <div class="container mt-5">
+        <h2 class="section-title">Search Results</h2>
+        @if (!Model.Any())
+        {
+            <div class="vosg-card text-center py-4">
+                <i class="bi bi-search display-4 text-muted"></i>
+                <p class="mt-2 text-muted">No locations found. Try a different search.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var loc in Model)
+                {
+                    var imgSrc2 = loc.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="loc-card">
+                            <div class="loc-card-img">
+                                <img src="@imgSrc2" alt="@loc.LocationName" />
+                            </div>
+                            <div class="loc-card-body">
+                                <div class="loc-card-title">@loc.LocationName</div>
+                                <div class="loc-card-sub"><i class="bi bi-geo-alt me-1"></i>@loc.City, @loc.Country</div>
+                                <div class="loc-card-footer mt-2">
+                                    <a asp-controller="Locations" asp-action="Details" asp-route-id="@loc.LocationsID"
+                                       class="btn btn-outline-primary btn-sm flex-fill">
+                                        <i class="bi bi-info-circle me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+<div class="how-it-works mt-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-4">How It <span>Works</span></h2>
+        <div class="row">
+            @{
+                var steps = new[]
+                {
+                    ("1", "bi-search",       "Browse Venues",      "Explore our curated list of event locations around the world."),
+                    ("2", "bi-calendar3",    "Select Date & Time", "Choose your preferred date, start and end time for the event."),
+                    ("3", "bi-check-circle", "Confirm Booking",    "Review your booking details and confirm your reservation."),
+                    ("4", "bi-credit-card",  "Make Payment",       "Complete your payment securely to lock in your venue."),
+                };
+            }
+            @foreach (var (num, icon, title, desc) in steps)
+            {
+                <div class="col-6 col-md-3">
+                    <div class="step-card">
+                        <div class="step-num">@num</div>
+                        <i class="bi @icon fs-4 text-primary mb-2 d-block"></i>
+                        <h5>@title</h5>
+                        <p>@desc</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@model IEnumerable<VOSG_NKBD.Models.Confirmation>
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<div class="container py-4">
+    <h1 class="section-title mb-4">🗓️ My <span>Bookings</span></h1>
+    @if (!Model.Any())
+    {
+        <div class="vosg-card text-center py-5">
+            <i class="bi bi-calendar-x display-4 text-muted"></i>
+            <p class="mt-3 text-muted">You have no bookings yet.</p>
+            <a asp-controller="Locations" asp-action="Index" class="btn btn-primary mt-2">
+                <i class="bi bi-search me-1"></i>Browse Locations
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="vosg-table">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th>Member</th>
+                        }
+                        <th>Location</th>
+                        <th>Section</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Total</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">#@c.ConfirmationID</td>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <td>@c.User?.FirstName @c.User?.LastName</td>
+                            }
+                            <td class="fw-semibold">@c.Place?.Location?.LocationName</td>
+                            <td>@c.Place?.PlaceName</td>
+                            <td>@c.StartTime.ToString("dd MMM HH:mm")</td>
+                            <td>@c.EndTime.ToString("dd MMM HH:mm")</td>
+                            <td class="fw-bold text-primary">$@c.TotalPrice.ToString("N2")</td>
+                            <td>
+                                @if (c.Payment?.PaymentStatus == "Paid")
+                                {
+                                    <span class="badge-paid">Paid</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge-pending">Pending</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
