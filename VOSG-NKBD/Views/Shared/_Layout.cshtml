@@ -9,18 +9,42 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VOSG_NKBD.styles.css" asp-append-version="true" />
     <style>
-        .nav-right { display: flex; align-items: center; gap: 36px; }
-        .nav-right a { font-size: 15px; text-decoration: none; color: #333; }
-        .btn-login { background: #1a3a6b; color: white !important; border-radius: 6px; padding: 6px 22px; font-size: 15px; }
-        .btn-login:hover { background: #142d55; color: white !important; }
+        .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        }
+
+        .nav-right a {
+        font-size: 15px;
+        text-decoration: none;
+        color: #333;
+        }
+
+        .btn-login {
+        background: #1a3a6b;
+        color: white !important;
+        border-radius: 6px;
+        padding: 6px 22px;
+        font-size: 15px;
+        }
+
+        .btn-login:hover {
+        background: #142d55;
+        color: white !important;
+        }
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-transparent border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand p-0 d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/images/logo-vosg.png" alt="VOSG-NKBD" height="70" style="object-fit:contain;" />
+                    <div style="line-height:1.5; text-align:center;">
+                        <div style="font-size:14px; font-weight:700; color:#20c997; letter-spacing:0.3px;">Vietnamese Overseas Students Group</div>
+                        <div style="font-size:12px; font-weight:600; color:#20c997; letter-spacing:0.5px; text-align:center;">---- Nguyen Khuyen Binh Duong ----</div>
+                    </div>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +67,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - VOSG_NKBD - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <span style="color:#ffc107; font-weight:700;">&copy; 2026 - VOSG-NKBD</span> - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
