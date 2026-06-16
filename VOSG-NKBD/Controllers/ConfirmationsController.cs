@@ -116,5 +116,32 @@ namespace VOSG_NKBD.Controllers
             if (conf == null) return NotFound();
             return View(conf);
         }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var isAdmin = User.IsInRole("Admin");
+
+            var confirmation = await _context.Confirmations
+                .Include(c => c.Payment)
+                .FirstOrDefaultAsync(c => c.ConfirmationID == id);
+
+            if (confirmation == null) return NotFound();
+
+         
+            if (!isAdmin && confirmation.MemberId != user!.Id)
+                return Forbid();
+
+            if (confirmation.Payment != null)
+                _context.Payments.Remove(confirmation.Payment);
+
+            _context.Confirmations.Remove(confirmation);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Booking #{id} has been cancelled.";
+            return RedirectToAction("Index");
+        }
+       
     }
-} 
+}

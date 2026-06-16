@@ -1,0 +1,103 @@
+﻿@model VOSG_NKBD.Models.Location
+@{
+    ViewData["Title"] = Model.LocationName;
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <h1 class="section-title mb-0">📍 <span>@Model.LocationName</span></h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            @{
+                var img = Model.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
+            }
+            <img src="@img" alt="@Model.LocationName"
+                 class="w-100 rounded shadow-sm" style="object-fit:cover;max-height:320px;" />
+        </div>
+        <div class="col-lg-7">
+            <div class="vosg-card h-100">
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Location Details</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Location Name</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.LocationName</dd>
+
+                    <dt class="col-sm-4 text-muted">Address</dt>
+                    <dd class="col-sm-8">@Model.Address</dd>
+
+                    <dt class="col-sm-4 text-muted">Suburb</dt>
+                    <dd class="col-sm-8">@Model.Suburb</dd>
+
+                    <dt class="col-sm-4 text-muted">City</dt>
+                    <dd class="col-sm-8">@Model.City</dd>
+
+                    <dt class="col-sm-4 text-muted">Country</dt>
+                    <dd class="col-sm-8">@Model.Country</dd>
+
+                    <dt class="col-sm-4 text-muted">Postal Code</dt>
+                    <dd class="col-sm-8">@Model.PostalCode</dd>
+
+                    <dt class="col-sm-4 text-muted">Phone Number</dt>
+                    <dd class="col-sm-8">@Model.PhoneNumber</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Places?.Any() == true)
+    {
+        <div class="mt-5">
+            <h2 class="section-title">🏛️ Available <span>Spaces</span></h2>
+            <div class="row g-4">
+                @foreach (var place in Model.Places!)
+                {
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="vosg-card h-100 d-flex flex-column">
+                            @if (!string.IsNullOrEmpty(place.ImageUrl))
+                            {
+                                <div class="loc-card-img mb-3" style="border-radius:8px;">
+                                    <img src="@place.ImageUrl" alt="@place.PlaceName" />
+                                </div>
+                            }
+                            <div class="fw-bold fs-5 mb-1">@place.PlaceName</div>
+                            <div class="text-muted small mb-3">@(place.Description ?? "A premium venue space ready for your event.")</div>
+                            <div class="fw-bold text-primary fs-5 mb-3">$@place.Price.ToString("N2") <span class="text-muted fs-6 fw-normal">NZD / session</span></div>
+                            <div class="mt-auto">
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <a asp-controller="Confirmations" asp-action="Book" asp-route-id="@place.PlaceID"
+                                       class="btn btn-primary w-100">
+                                        <i class="bi bi-calendar-plus me-1"></i>Book This Space
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-area="Identity" asp-page="/Account/Login"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>Login to Book
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mt-4 d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.LocationsID" class="btn btn-outline-secondary">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.LocationsID" class="btn btn-outline-danger">
+                <i class="bi bi-trash me-1"></i>Delete
+            </a>
+        </div>
+    }
+</div>

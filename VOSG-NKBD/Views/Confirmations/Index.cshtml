@@ -32,6 +32,7 @@
                         <th>End</th>
                         <th>Total</th>
                         <th>Payment</th>
+                        <th>Action</th>  
                     </tr>
                 </thead>
                 <tbody>
@@ -55,10 +56,20 @@
                                 }
                                 else
                                 {
-
                                     <span class="badge-pending">Pending</span>
                                 }
                             </td>
+                            
+                            <td>
+                                <form asp-action="Cancel" asp-route-id="@c.ConfirmationID" method="post"
+                                      onsubmit="return confirm('Cancel booking #@c.ConfirmationID? This cannot be undone.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                    </button>
+                                </form>
+                            </td>
+                           
                         </tr>
                     }
                 </tbody>
