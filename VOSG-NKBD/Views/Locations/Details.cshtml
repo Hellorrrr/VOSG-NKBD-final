@@ -16,8 +16,9 @@
             @{
                 var img = Model.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
             }
+            <!-- SỬA: đổi max-height:320px (cố định, gây cắt ngắn) thành h-100 (giãn full theo chiều cao khung bên cạnh) -->
             <img src="@img" alt="@Model.LocationName"
-                 class="w-100 rounded shadow-sm" style="object-fit:cover;max-height:320px;" />
+                 class="w-100 h-100 rounded shadow-sm" style="object-fit:cover;" />
         </div>
         <div class="col-lg-7">
             <div class="vosg-card h-100">
