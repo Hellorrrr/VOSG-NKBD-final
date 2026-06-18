@@ -30,7 +30,7 @@ namespace VOSG_NKBD.Controllers
             ViewBag.Cities = await _context.Locations.Select(l => l.City).Distinct().ToListAsync();
             ViewBag.Search = search;
             ViewBag.City = city;
-            ViewBag.Featured = await _context.Locations.Include(l => l.Places).Take(5).ToListAsync();
+            ViewBag.Featured = await _context.Locations.Include(l => l.Places).Take(6).ToListAsync();
 
             return View(await locations.ToListAsync());
         }

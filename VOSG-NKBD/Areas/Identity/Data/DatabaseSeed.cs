@@ -22,22 +22,24 @@ namespace VOSG_NKBD.Data
 
             var locations = new Location[]
             {
-                new() { LocationName = "Auckland Showgrounds",   Address = "217 Green Lane West",          Suburb = "Epsom",        City = "Auckland",  Country = "New Zealand", PostalCode = "1051",   PhoneNumber = "+6496230092"  },
-                new() { LocationName = "Nathan Phillips Square", Address = "100 Queen Street West",        Suburb = "Central City", City = "Toronto",   Country = "Canada",      PostalCode = "M5H2N2", PhoneNumber = "+14163922489" },
-                new() { LocationName = "Dr Phillips Center",     Address = "445 South Magnolia Avenue",    Suburb = "Central City", City = "Orlando",   Country = "USA",         PostalCode = "32801",  PhoneNumber = "+14073586603" },
-                new() { LocationName = "Federation Square",      Address = "Swanston and Flinders Street", Suburb = "Central City", City = "Melbourne", Country = "Australia",   PostalCode = "3000",   PhoneNumber = "+61396551900" },
-                new() { LocationName = "Finlandia Hall",         Address = "Mannerheimintie 13",           Suburb = "Central City", City = "Helsinki",  Country = "Finland",     PostalCode = "00100",  PhoneNumber = "+35894024100" },
+                new() { LocationName = "Auckland Showgrounds",                        Address = "217 Green Lane West",          Suburb = "Epsom",          City = "Auckland",           Country = "New Zealand",  PostalCode = "1051",     PhoneNumber = "+6496230092"  },
+                new() { LocationName = "Nathan Phillips Square",                      Address = "100 Queen Street West",        Suburb = "Central City",   City = "Toronto",            Country = "Canada",       PostalCode = "M5H2N2",   PhoneNumber = "+14163922489" },
+                new() { LocationName = "Dr Phillips Center",                          Address = "445 South Magnolia Avenue",    Suburb = "Central City",   City = "Orlando",            Country = "USA",          PostalCode = "32801",    PhoneNumber = "+14073586603" },
+                new() { LocationName = "Federation Square",                           Address = "Swanston and Flinders Street", Suburb = "Central City",   City = "Melbourne",          Country = "Australia",    PostalCode = "3000",     PhoneNumber = "+61396551900" },
+                new() { LocationName = "Finlandia Hall",                              Address = "Mannerheimintie 13",           Suburb = "Central City",   City = "Helsinki",           Country = "Finland",      PostalCode = "00100",    PhoneNumber = "+35894024100" },
+                new() { LocationName = "Binh Duong Convention and Exhibition Center", Address = "10 Huu Nghi Boulevard",        Suburb = "Phu Chanh Ward", City = "Ho Chi Minh City",   Country = "Vietnam",      PostalCode = "75000",    PhoneNumber = "+842742222888" },
             };
             context.Locations.AddRange(locations);
             await context.SaveChangesAsync();
 
             var places = new Place[]
             {
-                new() { PlaceName = "Main Hall A",   Description = "Large event hall",  Price = 500m, LocationsID = locations[0].LocationsID, ImageUrl = "/images/hall-auckland.jpg"  },
-                new() { PlaceName = "Conference B",  Description = "Conference room",   Price = 200m, LocationsID = locations[1].LocationsID, ImageUrl = "/images/hall-toronto.jpg"   },
-                new() { PlaceName = "Outdoor Stage", Description = "Open air stage",    Price = 350m, LocationsID = locations[2].LocationsID, ImageUrl = "/images/hall-orlando.jpg"   },
-                new() { PlaceName = "Gallery Room",  Description = "Art gallery space", Price = 150m, LocationsID = locations[3].LocationsID, ImageUrl = "/images/hall-melbourne.jpg" },
-                new() { PlaceName = "Concert Hall",  Description = "Concert venue",     Price = 800m, LocationsID = locations[4].LocationsID, ImageUrl = "/images/hall-helsinki.jpg"  },
+                new() { PlaceName = "Main Hall A",          Description = "Large event hall",                                                                Price =  500m,  LocationsID = locations[0].LocationsID, ImageUrl = "/images/hall-auckland.jpg"  },
+                new() { PlaceName = "Conference B",         Description = "Conference room",                                                                 Price =  200m,  LocationsID = locations[1].LocationsID, ImageUrl = "/images/hall-toronto.jpg"   },
+                new() { PlaceName = "Outdoor Stage",        Description = "Open air stage",                                                                  Price =  350m,  LocationsID = locations[2].LocationsID, ImageUrl = "/images/hall-orlando.jpg"   },
+                new() { PlaceName = "Gallery Room",         Description = "Art gallery space",                                                               Price =  150m,  LocationsID = locations[3].LocationsID, ImageUrl = "/images/hall-melbourne.jpg" },
+                new() { PlaceName = "Concert Hall",         Description = "Concert venue",                                                                   Price =  800m,  LocationsID = locations[4].LocationsID, ImageUrl = "/images/hall-helsinki.jpg"  },
+                new() { PlaceName = "Grand Convention Hall",Description = "World-class convention hall for large-scale events, exhibitions and conferences", Price = 1200m,  LocationsID = locations[5].LocationsID, ImageUrl = "/images/hall-binhduong.jpg" },
             };
             context.Places.AddRange(places);
             await context.SaveChangesAsync();
