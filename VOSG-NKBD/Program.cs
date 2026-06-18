@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using VOSG_NKBD.Data;
 using VOSG_NKBD.Models;
+using VOSG_NKBD.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,9 @@ builder.Services.AddDefaultIdentity<VOSG_NKBDUser>(options =>
 .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

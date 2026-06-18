@@ -52,8 +52,10 @@ namespace VOSG_NKBD.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Reset Password - VOSG-NKBD",
+                    $"Hello,<br><br>We received a request to reset your password.<br><br>" +
+                    $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='background:#0d6efd;color:#fff;padding:10px 20px;border-radius:5px;text-decoration:none;'>Click here to reset your password</a><br><br>" +
+                    $"If you did not request this, please ignore this email.<br><br>VOSG-NKBD Team");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
