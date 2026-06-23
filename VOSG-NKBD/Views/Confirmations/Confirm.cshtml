@@ -9,6 +9,7 @@
             <div class="vosg-card">
                 <h2 class="section-title mb-4">✅ Confirm <span>Booking</span></h2>
                 <p class="text-muted mb-4">Please review your booking details below before confirming.</p>
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
                 <form asp-action="Confirm" method="post">
                     <input type="hidden" asp-for="PlaceID" />
                     <input type="hidden" asp-for="StartTime" />
@@ -65,9 +66,17 @@
         </div>
         <div class="col-lg-4">
             <div class="booking-summary">
-                <div style="background:linear-gradient(135deg,var(--primary),var(--accent));height:160px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
-                    <i class="bi bi-building text-white" style="font-size:3rem;"></i>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.Place?.ImageUrl))
+                {
+                    <img src="@Model.Place.ImageUrl" alt="@Model.Place.PlaceName"
+                         style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:1rem;" />
+                }
+                else
+                {
+                    <div style="background:linear-gradient(135deg,var(--primary),var(--accent));height:160px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                        <i class="bi bi-building text-white" style="font-size:3rem;"></i>
+                    </div>
+                }
                 <h5 class="fw-bold mb-3">Booking Summary</h5>
                 <div class="summary-row"><span>Location</span><strong>@Model.Place?.Location?.LocationName</strong></div>
                 <div class="summary-row"><span>Section</span><strong>@Model.Place?.PlaceName</strong></div>

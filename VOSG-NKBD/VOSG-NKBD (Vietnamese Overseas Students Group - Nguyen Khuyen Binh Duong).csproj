@@ -5,7 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>VOSG_NKBD</RootNamespace>
-	</PropertyGroup>
+	  <UserSecretsId>d3efa1a6-a819-4e94-a7e5-416f5fce043f</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />

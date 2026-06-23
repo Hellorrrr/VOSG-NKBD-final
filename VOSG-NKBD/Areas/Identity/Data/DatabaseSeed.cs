@@ -11,6 +11,12 @@ namespace VOSG_NKBD.Data
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<VOSG_NKBDUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+            // Mật khẩu seed lấy từ config (User Secrets / appsettings).
+            // Nếu không cấu hình, dùng giá trị mặc định để app vẫn chạy được khi mới clone.
+            var adminPassword = config["SeedData:AdminPassword"] ?? "Admin@123456";
+            var memberPassword = config["SeedData:MemberPassword"] ?? "Member@123456";
 
             context.Database.EnsureCreated();
 
@@ -48,7 +54,7 @@ namespace VOSG_NKBD.Data
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
                 var admin = new VOSG_NKBDUser { UserName = adminEmail, Email = adminEmail, FirstName = "Admin", LastName = "VOSG", EmailConfirmed = true };
-                var result = await userManager.CreateAsync(admin, "Admin@123456");
+                var result = await userManager.CreateAsync(admin, adminPassword);
                 if (result.Succeeded) await userManager.AddToRoleAsync(admin, "Admin");
             }
 
@@ -67,7 +73,7 @@ namespace VOSG_NKBD.Data
                 if (existing == null)
                 {
                     var user = new VOSG_NKBDUser { UserName = email, Email = email, FirstName = first, LastName = last, EmailConfirmed = true };
-                    var r = await userManager.CreateAsync(user, "Member@123456");
+                    var r = await userManager.CreateAsync(user, memberPassword);
                     if (r.Succeeded) { await userManager.AddToRoleAsync(user, "Member"); createdMembers.Add(user); }
                 }
                 else createdMembers.Add(existing);
