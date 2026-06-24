@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using VOSG_NKBD.Data;
@@ -8,16 +9,11 @@ using VOSG_NKBD.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ép toàn bộ app dùng en-US (ISO date format) để tránh việc parse DateTime
+// từ form bị lệch ngày/tháng do locale của máy chủ/máy dev khác nhau.
 var defaultCulture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
 CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
-
-builder.Services.Configure<Microsoft.AspNetCore.Localization.RequestLocalizationOptions>(options =>
-{
-    options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(defaultCulture);
-    options.SupportedCultures = new List<CultureInfo> { defaultCulture };
-    options.SupportedUICultures = new List<CultureInfo> { defaultCulture };
-});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=vosg.db"));
@@ -46,8 +42,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-var localizationOptions = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Localization.RequestLocalizationOptions>>().Value;
-app.UseRequestLocalization(localizationOptions);
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+});
 
 app.UseRouting();
 app.UseAuthentication();

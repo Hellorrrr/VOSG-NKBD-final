@@ -90,15 +90,15 @@ namespace VOSG_NKBD.Controllers
             ModelState.Remove("User");
             ModelState.Remove("Payment");
 
-            // Validate: EndTime phải sau StartTime
+            
             if (confirmation.EndTime <= confirmation.StartTime)
                 ModelState.AddModelError("EndTime", "End time must be after start time.");
 
-            // Validate: không cho đặt chỗ trong quá khứ
+            
             if (confirmation.StartTime < DateTime.Now)
                 ModelState.AddModelError("StartTime", "Start time cannot be in the past.");
 
-            // Validate: chặn trùng lịch (double-booking) cho cùng Place
+            
             var hasConflict = await _context.Confirmations
                 .Where(c => c.PlaceID == confirmation.PlaceID)
                 .AnyAsync(c => confirmation.StartTime < c.EndTime
@@ -173,6 +173,5 @@ namespace VOSG_NKBD.Controllers
             TempData["Success"] = $"Booking #{id} has been cancelled.";
             return RedirectToAction("Index");
         }
-
     }
 }

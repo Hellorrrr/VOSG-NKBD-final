@@ -125,7 +125,6 @@
             fillHourOptions(hourEl);
             fillMinuteOptions(minuteEl);
 
-            // Chặn chọn ngày trong quá khứ ngay trên UI
             const todayStr = new Date().toISOString().slice(0, 10);
             dateEl.min = todayStr;
 
@@ -195,9 +194,21 @@
 
         initTimePicker('Start', '@Model.StartTime.ToString("yyyy-MM-ddTHH:mm:ss")');
         initTimePicker('End', '@Model.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")');
+        syncHidden('Start');
+        syncHidden('End');
+
+       
+        ['Start', 'End'].forEach(function (prefix) {
+            ['Date', 'Hour', 'Minute', 'AmPm'].forEach(function (suffix) {
+                document.getElementById(prefix + suffix)
+                    .addEventListener('change', function () { syncHidden(prefix); });
+            });
+        });
 
         document.querySelector('form').addEventListener('submit', function (e) {
             clearError();
+            syncHidden('Start');
+            syncHidden('End');
 
             const start = readDateTime('Start');
             const end = readDateTime('End');
@@ -220,9 +231,6 @@
                 showError('End time must be after start time.');
                 return;
             }
-
-            syncHidden('Start');
-            syncHidden('End');
         });
     </script>
 }
