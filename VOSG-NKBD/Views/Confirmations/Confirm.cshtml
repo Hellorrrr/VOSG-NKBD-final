@@ -12,8 +12,8 @@
                 <div asp-validation-summary="All" class="alert alert-danger" role="alert" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
                 <form asp-action="Confirm" method="post">
                     <input type="hidden" asp-for="PlaceID" />
-                    <input type="hidden" asp-for="StartTime" />
-                    <input type="hidden" asp-for="EndTime" />
+                    <input type="hidden" name="StartTime" value="@Model.StartTime.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                    <input type="hidden" name="EndTime" value="@Model.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")" />
                     <input type="hidden" asp-for="TotalPrice" />
                     <div class="row g-3 mb-4">
                         <div class="col-sm-6">
