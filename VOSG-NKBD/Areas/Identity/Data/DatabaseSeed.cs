@@ -7,22 +7,21 @@ namespace VOSG_NKBD.Data
     {
         public static async Task SeedAsync(IApplicationBuilder app)
         {
-            using var scope = app.ApplicationServices.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<VOSG_NKBDUser>>();
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            using var scope    = app.ApplicationServices.CreateScope();
+            var context        = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var userManager    = scope.ServiceProvider.GetRequiredService<UserManager<VOSG_NKBDUser>>();
+            var roleManager    = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var config         = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            // Mật khẩu seed lấy từ config (User Secrets / appsettings).
-            // Nếu không cấu hình, dùng giá trị mặc định để app vẫn chạy được khi mới clone.
-            var adminPassword = config["SeedData:AdminPassword"] ?? "Admin@123456";
+          
+            var adminPassword  = config["SeedData:AdminPassword"] ?? "Admin@123456";
             var memberPassword = config["SeedData:MemberPassword"] ?? "Member@123456";
 
             context.Database.EnsureCreated();
 
             foreach (var role in new[] { "Admin", "Member" })
-                if (!await roleManager.RoleExistsAsync(role))
-                    await roleManager.CreateAsync(new IdentityRole(role));
+            if (!await roleManager.RoleExistsAsync(role))
+                 await roleManager.CreateAsync(new IdentityRole(role));
 
             if (context.Locations.Any()) return;
 
@@ -48,12 +47,12 @@ namespace VOSG_NKBD.Data
                 new() { PlaceName = "Grand Convention Hall",Description = "World-class convention hall for large-scale events, exhibitions and conferences", Price = 1200m,  LocationsID = locations[5].LocationsID, ImageUrl = "/images/hall-binhduong.jpg" },
             };
             context.Places.AddRange(places);
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
             var adminEmail = "admin@vosg.com";
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
-                var admin = new VOSG_NKBDUser { UserName = adminEmail, Email = adminEmail, FirstName = "Admin", LastName = "VOSG", EmailConfirmed = true };
+                var admin  = new VOSG_NKBDUser { UserName = adminEmail, Email = adminEmail, FirstName = "Admin", LastName = "VOSG", EmailConfirmed = true };
                 var result = await userManager.CreateAsync(admin, adminPassword);
                 if (result.Succeeded) await userManager.AddToRoleAsync(admin, "Admin");
             }
@@ -73,7 +72,7 @@ namespace VOSG_NKBD.Data
                 if (existing == null)
                 {
                     var user = new VOSG_NKBDUser { UserName = email, Email = email, FirstName = first, LastName = last, EmailConfirmed = true };
-                    var r = await userManager.CreateAsync(user, memberPassword);
+                    var r    = await userManager.CreateAsync(user, memberPassword);
                     if (r.Succeeded) { await userManager.AddToRoleAsync(user, "Member"); createdMembers.Add(user); }
                 }
                 else createdMembers.Add(existing);
@@ -81,7 +80,7 @@ namespace VOSG_NKBD.Data
 
             if (createdMembers.Count < 4) return;
 
-            var confirmations = new Confirmation[]
+            var confirmations    = new Confirmation[]
             {
                 new() { MemberId = createdMembers[0].Id, PlaceID = places[0].PlaceID, ConfirmationDate = DateTime.Today, StartTime = new DateTime(2026, 9, 14, 9, 0, 0), EndTime = new DateTime(2026, 9, 14, 17, 0, 0), TotalPrice = places[0].Price },
                 new() { MemberId = createdMembers[1].Id, PlaceID = places[1].PlaceID, ConfirmationDate = DateTime.Today, StartTime = new DateTime(2026, 9, 15, 9, 0, 0), EndTime = new DateTime(2026, 9, 15, 17, 0, 0), TotalPrice = places[1].Price },
@@ -94,10 +93,10 @@ namespace VOSG_NKBD.Data
             var payments = confirmations.Select(c => new Payment
             {
                 ConfirmationID = c.ConfirmationID,
-                VOSG_NKBDId = c.MemberId,
-                PaymentAmount = c.TotalPrice,
-                PaymentDate = DateTime.Today,
-                PaymentStatus = "Paid"
+                VOSG_NKBDId    = c.MemberId,
+                PaymentAmount  = c.TotalPrice,
+                PaymentDate    = DateTime.Today,
+                PaymentStatus  = "Paid"
             }).ToArray();
             context.Payments.AddRange(payments);
             await context.SaveChangesAsync();

@@ -9,8 +9,7 @@ using VOSG_NKBD.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ép toàn bộ app dùng en-US (ISO date format) để tránh việc parse DateTime
-// từ form bị lệch ngày/tháng do locale của máy chủ/máy dev khác nhau.
+
 var defaultCulture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
 CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
@@ -21,7 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddDefaultIdentity<VOSG_NKBDUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequiredLength = 8;
+    options.Password.RequiredLength        = 8;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
@@ -31,30 +30,30 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
-var app = builder.Build();
+ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+     app.UseExceptionHandler("/Home/Error");
+     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+     app.UseHttpsRedirection();
+     app.UseStaticFiles();
 
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
-    DefaultRequestCulture = new RequestCulture(defaultCulture),
-    SupportedCultures = new List<CultureInfo> { defaultCulture },
-    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+    DefaultRequestCulture      = new RequestCulture   (defaultCulture),
+    SupportedCultures          = new List<CultureInfo>{defaultCulture},
+    SupportedUICultures        = new List<CultureInfo>{defaultCulture}
 });
 
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
-app.MapRazorPages();
-app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+    app.MapRazorPages();
+    app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 await DatabaseSeed.SeedAsync(app);
 
