@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 var defaultCulture = new CultureInfo("en-US");
-CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
+CultureInfo.DefaultThreadCurrentCulture    = defaultCulture;
 CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
 
 builder.Services.AddDbContext<AppDbContext>(options =>
