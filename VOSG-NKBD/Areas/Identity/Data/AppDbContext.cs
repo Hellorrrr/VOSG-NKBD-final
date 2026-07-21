@@ -16,6 +16,26 @@ namespace VOSG_NKBD.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+           
+
+            builder.Entity<Confirmation>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.MemberId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Payment>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.VOSG_NKBDId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Payment>()
+                .HasOne(p => p.Confirmation)
+                .WithOne(c => c.Payment)
+                .HasForeignKey<Payment>(p => p.ConfirmationID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

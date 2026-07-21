@@ -36,7 +36,7 @@ namespace VOSG_NKBD.Controllers
             return View(await query.OrderByDescending(c => c.ConfirmationDate).ToListAsync());
         }
 
-        public async Task<IActionResult> Book(int? id)
+        public async Task<IActionResult> Book(int? id) 
         {
             if (id == null) return NotFound();
             var place = await _context.Places
