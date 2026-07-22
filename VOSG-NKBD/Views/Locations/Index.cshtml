@@ -1,6 +1,9 @@
-﻿@model VOSG_NKBD.Data.PaginatedList<VOSG_NKBD.Models.Location>
+﻿@* locations list page - table with search, column sorting and pagination.
+   the model is PaginatedList so only one page of results loads at a time *@
+@model VOSG_NKBD.Data.PaginatedList<VOSG_NKBD.Models.Location>
 @{
     ViewData["Title"] = "Locations";
+    @* keep the current sort + search so the links below dont lose them *@
     var sortOrder = ViewData["CurrentSort"]?.ToString();
     var filter = ViewData["CurrentFilter"]?.ToString();
 }
@@ -11,6 +14,7 @@
             <h1 class="section-title mb-0">📍 Location <span>Management</span></h1>
             <small class="text-muted">@Model.Count total results</small>
         </div>
+        @* only admins can add locations - members just browse and book *@
         @if (User.IsInRole("Admin"))
         {
             <a asp-action="Create" class="btn btn-primary">
@@ -19,16 +23,19 @@
         }
     </div>
 
+    @* search box - GET form so the search ends up in the url *@
     <form method="get" class="mb-4">
         <div class="input-group" style="max-width:420px;">
             <input type="text" name="searchString" value="@filter"
                    class="form-control" placeholder="Search by name, address or city…" />
             <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            @* the X button only shows while a search is active, clears it *@
             @if (!string.IsNullOrEmpty(filter))
             {
                 <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x"></i></a>
             }
         </div>
+        @* hidden field so searching doesnt reset the current column sort *@
         <input type="hidden" name="sortOrder" value="@sortOrder" />
     </form>
 
@@ -37,8 +44,10 @@
             <thead>
                 <tr>
                     <th>
+                        @* clickable header - NameSort flips between asc/desc
+                           in the controller each time you click it *@
                         <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSort"]"
-                               asp-route-currentFilter="@filter" class="sort-link">
+                           asp-route-currentFilter="@filter" class="sort-link">
                             Location Name <i class="bi bi-arrow-down-up ms-1"></i>
                         </a>
                     </th>
@@ -46,7 +55,7 @@
                     <th>Suburb</th>
                     <th>
                         <a asp-action="Index" asp-route-sortOrder="@ViewData["CitySort"]"
-                               asp-route-currentFilter="@filter" class="sort-link">
+                           asp-route-currentFilter="@filter" class="sort-link">
                             City <i class="bi bi-arrow-down-up ms-1"></i>
                         </a>
                     </th>
@@ -57,6 +66,7 @@
                 </tr>
             </thead>
             <tbody>
+                @* one row per location on the current page *@
                 @foreach (var loc in Model)
                 {
                     <tr>
@@ -69,18 +79,20 @@
                         <td>@loc.PhoneNumber</td>
                         <td class="text-center">
                             <div class="d-flex gap-1 justify-content-center">
+                                @* everyone can view details *@
                                 <a asp-action="Details" asp-route-id="@loc.LocationsID"
-                                       class="btn btn-sm btn-outline-primary" title="Show Info">
+                                   class="btn btn-sm btn-outline-primary" title="Show Info">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @* edit/delete are admin-only *@
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <a asp-action="Edit" asp-route-id="@loc.LocationsID"
-                                           class="btn btn-sm btn-outline-secondary" title="Edit">
+                                       class="btn btn-sm btn-outline-secondary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <a asp-action="Delete" asp-route-id="@loc.LocationsID"
-                                           class="btn btn-sm btn-outline-danger" title="Delete">
+                                       class="btn btn-sm btn-outline-danger" title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 }
@@ -88,6 +100,7 @@
                         </td>
                     </tr>
                 }
+                @* empty state row instead of a blank table *@
                 @if (!Model.Any())
                 {
                     <tr><td colspan="8" class="text-center text-muted py-4">No locations found.</td></tr>
@@ -96,18 +109,22 @@
         </table>
     </div>
 
+    @* page number buttons - hidden if everything fits on one page *@
     @if (Model.TotalPages > 1)
     {
         <nav class="mt-3">
             <ul class="pagination justify-content-center">
+                @* prev arrow, disabled on page 1 *@
                 <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
                     <a class="page-link" asp-action="Index"
-                           asp-route-sortOrder="@sortOrder"
-                           asp-route-pageNumber="@(Model.PageIndex - 1)"
-                           asp-route-currentFilter="@filter">
+                       asp-route-sortOrder="@sortOrder"
+                       asp-route-pageNumber="@(Model.PageIndex - 1)"
+                       asp-route-currentFilter="@filter">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
+                @* numbered buttons - every link carries sort + filter along
+                   so changing page keeps the search results *@
                 @for (var i = 1; i <= Model.TotalPages; i++)
                 {
                     <li class="page-item @(i == Model.PageIndex ? "active" : "")">
@@ -117,11 +134,12 @@
                            asp-route-currentFilter="@filter">@i</a>
                     </li>
                 }
+                @* next arrow, disabled on the last page *@
                 <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
                     <a class="page-link" asp-action="Index"
-                           asp-route-sortOrder="@sortOrder"
-                           asp-route-pageNumber="@(Model.PageIndex + 1)"
-                           asp-route-currentFilter="@filter">
+                       asp-route-sortOrder="@sortOrder"
+                       asp-route-pageNumber="@(Model.PageIndex + 1)"
+                       asp-route-currentFilter="@filter">
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>

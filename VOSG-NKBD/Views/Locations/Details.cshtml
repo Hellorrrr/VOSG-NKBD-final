@@ -1,5 +1,8 @@
-﻿@model VOSG_NKBD.Models.Location
+﻿@* details page for ONE location: photo + info table,
+   the bookable spaces underneath, and admin buttons at the bottom *@
+@model VOSG_NKBD.Models.Location
 @{
+    @* browser tab shows the venue's actual name *@
     ViewData["Title"] = Model.LocationName;
 }
 
@@ -12,17 +15,20 @@
     </div>
 
     <div class="row g-4">
+        @* left column: big photo (first place's image, or the default) *@
         <div class="col-lg-5">
             @{
                 var img = Model.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
             }
-          
+
             <img src="@img" alt="@Model.LocationName"
                  class="w-100 h-100 rounded shadow-sm" style="object-fit:cover;" />
         </div>
+        @* right column: all the location fields in a definition list *@
         <div class="col-lg-7">
             <div class="vosg-card h-100">
                 <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Location Details</h5>
+                @* dl/dt/dd = label + value pairs, bootstrap's row/col splits them 4/8 *@
                 <dl class="row mb-0">
                     <dt class="col-sm-4 text-muted">Location Name</dt>
                     <dd class="col-sm-8 fw-semibold">@Model.LocationName</dd>
@@ -49,6 +55,7 @@
         </div>
     </div>
 
+    @* the bookable spaces at this location - section hidden if there are none *@
     @if (Model.Places?.Any() == true)
     {
         <div class="mt-5">
@@ -65,9 +72,11 @@
                                 </div>
                             }
                             <div class="fw-bold fs-5 mb-1">@place.PlaceName</div>
+                            @* ?? = fallback text if the place has no description *@
                             <div class="text-muted small mb-3">@(place.Description ?? "A premium venue space ready for your event.")</div>
                             <div class="fw-bold text-primary fs-5 mb-3">$@place.Price.ToString("N2") <span class="text-muted fs-6 fw-normal">NZD / session</span></div>
                             <div class="mt-auto">
+                                @* logged in -> Book button, guest -> sent to login first *@
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
                                     <a asp-controller="Confirmations" asp-action="Book" asp-route-id="@place.PlaceID"
@@ -90,6 +99,7 @@
         </div>
     }
 
+    @* admin-only edit/delete shortcuts at the bottom of the page *@
     @if (User.IsInRole("Admin"))
     {
         <div class="mt-4 d-flex gap-2">

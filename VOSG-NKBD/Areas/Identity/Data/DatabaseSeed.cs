@@ -1,30 +1,46 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using VOSG_NKBD.Models;
 
 namespace VOSG_NKBD.Data
 {
+    // seeds the database with starting data the first time the app runs:
+    // roles, an admin account, test members, locations, places and some bookings.
+    // runs on every startup but skips itself if data already exists
     public static class DatabaseSeed
     {
         public static async Task SeedAsync(IApplicationBuilder app)
         {
-            using var scope    = app.ApplicationServices.CreateScope();
-            var context        = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var userManager    = scope.ServiceProvider.GetRequiredService<UserManager<VOSG_NKBDUser>>();
-            var roleManager    = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var config         = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // create a scope to grab the services we need (DI)
+            using var scope = app.ApplicationServices.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<VOSG_NKBDUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-          
-            var adminPassword  = config["SeedData:AdminPassword"] ?? "Admin@123456";
-            var memberPassword = config["SeedData:MemberPassword"] ?? "Member@123456";
+            // SECURITY: passwords come from user secrets (dev) or environment
+            // variables (production) - NOT from source code. no fallback on
+            // purpose: if the secret is missing the app throws instead of
+            // silently creating accounts with a password visible in the repo
+            var adminPassword = config["SeedData:AdminPassword"]
+                ?? throw new InvalidOperationException("SeedData:AdminPassword is not configured. Set it in user secrets.");
+            var memberPassword = config["SeedData:MemberPassword"]
+                ?? throw new InvalidOperationException("SeedData:MemberPassword is not configured. Set it in user secrets.");
 
-            context.Database.EnsureCreated();
+            // apply any pending EF migrations - creates the database if it
+            // doesn't exist yet (better than EnsureCreated because it keeps
+            // the migration history working)
+            await context.Database.MigrateAsync();
 
+            // make sure both roles exist before we assign anyone to them
             foreach (var role in new[] { "Admin", "Member" })
-            if (!await roleManager.RoleExistsAsync(role))
-                 await roleManager.CreateAsync(new IdentityRole(role));
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole(role));
 
+            // if locations already exist we've seeded before - stop here
             if (context.Locations.Any()) return;
 
+            // ---- sample venues ----
             var locations = new Location[]
             {
                 new() { LocationName = "Auckland Showgrounds",                        Address = "217 Green Lane West",          Suburb = "Epsom",          City = "Auckland",           Country = "New Zealand",  PostalCode = "1051",     PhoneNumber = "+6496230092"  },
@@ -35,8 +51,9 @@ namespace VOSG_NKBD.Data
                 new() { LocationName = "Binh Duong Convention and Exhibition Center", Address = "10 Huu Nghi Boulevard",        Suburb = "Phu Chanh Ward", City = "Ho Chi Minh City",   Country = "Vietnam",      PostalCode = "75000",    PhoneNumber = "+842742222888" },
             };
             context.Locations.AddRange(locations);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(); // save now so LocationsID values exist for the places below
 
+            // ---- one bookable space per venue ----
             var places = new Place[]
             {
                 new() { PlaceName = "Main Hall A",          Description = "Large event hall",                                                                Price =  500m,  LocationsID = locations[0].LocationsID, ImageUrl = "/images/hall-auckland.jpg"  },
@@ -47,16 +64,18 @@ namespace VOSG_NKBD.Data
                 new() { PlaceName = "Grand Convention Hall",Description = "World-class convention hall for large-scale events, exhibitions and conferences", Price = 1200m,  LocationsID = locations[5].LocationsID, ImageUrl = "/images/hall-binhduong.jpg" },
             };
             context.Places.AddRange(places);
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
+            // ---- admin account ----
             var adminEmail = "admin@vosg.com";
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
-                var admin  = new VOSG_NKBDUser { UserName = adminEmail, Email = adminEmail, FirstName = "Admin", LastName = "VOSG", EmailConfirmed = true };
+                var admin = new VOSG_NKBDUser { UserName = adminEmail, Email = adminEmail, FirstName = "Admin", LastName = "VOSG", EmailConfirmed = true };
                 var result = await userManager.CreateAsync(admin, adminPassword);
                 if (result.Succeeded) await userManager.AddToRoleAsync(admin, "Admin");
             }
 
+            // ---- test member accounts ----
             var members = new (string First, string Last, string Email)[]
             {
                 ("Nicolas", "Jackson",  "nicolas@vosg.com"),
@@ -72,15 +91,17 @@ namespace VOSG_NKBD.Data
                 if (existing == null)
                 {
                     var user = new VOSG_NKBDUser { UserName = email, Email = email, FirstName = first, LastName = last, EmailConfirmed = true };
-                    var r    = await userManager.CreateAsync(user, memberPassword);
+                    var r = await userManager.CreateAsync(user, memberPassword);
                     if (r.Succeeded) { await userManager.AddToRoleAsync(user, "Member"); createdMembers.Add(user); }
                 }
                 else createdMembers.Add(existing);
             }
 
+            // need at least 4 members for the sample bookings below
             if (createdMembers.Count < 4) return;
 
-            var confirmations    = new Confirmation[]
+            // ---- sample bookings so the tables aren't empty on first run ----
+            var confirmations = new Confirmation[]
             {
                 new() { MemberId = createdMembers[0].Id, PlaceID = places[0].PlaceID, ConfirmationDate = DateTime.Today, StartTime = new DateTime(2026, 9, 14, 9, 0, 0), EndTime = new DateTime(2026, 9, 14, 17, 0, 0), TotalPrice = places[0].Price },
                 new() { MemberId = createdMembers[1].Id, PlaceID = places[1].PlaceID, ConfirmationDate = DateTime.Today, StartTime = new DateTime(2026, 9, 15, 9, 0, 0), EndTime = new DateTime(2026, 9, 15, 17, 0, 0), TotalPrice = places[1].Price },
@@ -90,13 +111,14 @@ namespace VOSG_NKBD.Data
             context.Confirmations.AddRange(confirmations);
             await context.SaveChangesAsync();
 
+            // ---- matching "Paid" payment record for each sample booking ----
             var payments = confirmations.Select(c => new Payment
             {
                 ConfirmationID = c.ConfirmationID,
-                VOSG_NKBDId    = c.MemberId,
-                PaymentAmount  = c.TotalPrice,
-                PaymentDate    = DateTime.Today,
-                PaymentStatus  = "Paid"
+                VOSG_NKBDId = c.MemberId,
+                PaymentAmount = c.TotalPrice,
+                PaymentDate = DateTime.Today,
+                PaymentStatus = "Paid"
             }).ToArray();
             context.Payments.AddRange(payments);
             await context.SaveChangesAsync();

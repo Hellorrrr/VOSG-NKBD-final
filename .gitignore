@@ -365,3 +365,7 @@ FodyWeavers.xsd
 *.db
 *.db-shm
 *.db-wal
+# local databases - never commit these
+*.db
+*.db-shm
+*.db-wal

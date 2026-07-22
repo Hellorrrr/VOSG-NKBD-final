@@ -1,4 +1,6 @@
-﻿@model VOSG_NKBD.Models.Confirmation
+﻿@* review screen - step 2 of booking. user double-checks everything
+   before the booking + payment actually get saved to the database *@
+@model VOSG_NKBD.Models.Confirmation
 @{
     ViewData["Title"] = "Confirm Booking";
 }
@@ -9,12 +11,19 @@
             <div class="vosg-card">
                 <h2 class="section-title mb-4">✅ Confirm <span>Booking</span></h2>
                 <p class="text-muted mb-4">Please review your booking details below before confirming.</p>
+                @* error box - only visible if the server rejected something
+                   (e.g. the time slot got taken while the user was reviewing) *@
                 <div asp-validation-summary="All" class="alert alert-danger" role="alert" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
                 <form asp-action="Confirm" method="post">
+                    @* everything travels in hidden fields - this page has no
+                       editable inputs, it just re-posts the chosen values.
+                       times are formatted as ISO so model binding parses them
+                       the same way in any culture setting *@
                     <input type="hidden" asp-for="PlaceID" />
                     <input type="hidden" name="StartTime" value="@Model.StartTime.ToString("yyyy-MM-ddTHH:mm:ss")" />
                     <input type="hidden" name="EndTime" value="@Model.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")" />
                     <input type="hidden" asp-for="TotalPrice" />
+                    @* the grey info boxes - just display, all readonly *@
                     <div class="row g-3 mb-4">
                         <div class="col-sm-6">
                             <div class="p-3 rounded" style="background:var(--gray-100);">
@@ -43,6 +52,8 @@
                         <div class="col-sm-6">
                             <div class="p-3 rounded" style="background:var(--gray-100);">
                                 <small class="text-muted d-block">Duration</small>
+                                @* duration is calculated on the fly, not stored -
+                                   End minus Start gives a TimeSpan *@
                                 <strong>@((Model.EndTime - Model.StartTime).TotalHours.ToString("N1")) hours</strong>
                             </div>
                         </div>
@@ -54,9 +65,11 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2">
+                        @* submit -> Confirm POST action saves booking + payment *@
                         <button type="submit" class="btn btn-primary flex-fill">
                             <i class="bi bi-check-circle me-1"></i>Confirm Booking
                         </button>
+                        @* Back returns to the form to change times *@
                         <a asp-action="Book" asp-route-id="@Model.PlaceID" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-1"></i>Back
                         </a>
@@ -64,6 +77,7 @@
                 </form>
             </div>
         </div>
+        @* same summary card as the Book page for consistency *@
         <div class="col-lg-4">
             <div class="booking-summary">
                 @if (!string.IsNullOrEmpty(Model.Place?.ImageUrl))
@@ -73,6 +87,7 @@
                 }
                 else
                 {
+                    @* gradient placeholder if there's no photo *@
                     <div style="background:linear-gradient(135deg,var(--primary),var(--accent));height:160px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
                         <i class="bi bi-building text-white" style="font-size:3rem;"></i>
                     </div>
