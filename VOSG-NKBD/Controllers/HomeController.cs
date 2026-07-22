@@ -6,6 +6,7 @@ using VOSG_NKBD.Models;
 
 namespace VOSG_NKBD.Controllers
 {
+    // public pages, no login needed here
     public class HomeController : Controller
     {
         private readonly AppDbContext _context;
@@ -27,6 +28,7 @@ namespace VOSG_NKBD.Controllers
             if (!string.IsNullOrEmpty(city))
                 locations = locations.Where(l => l.City == city);
 
+            // Distinct so each city only appears once in the filter dropdown
             ViewBag.Cities = await _context.Locations.Select(l => l.City).Distinct().ToListAsync();
             ViewBag.Search = search;
             ViewBag.City = city;
@@ -35,6 +37,7 @@ namespace VOSG_NKBD.Controllers
             return View(await locations.ToListAsync());
         }
 
+        // /Home/City/Auckland - id is the city name because of the default route pattern
         public async Task<IActionResult> City(string id)
         {
             if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
@@ -44,6 +47,7 @@ namespace VOSG_NKBD.Controllers
                 .Where(l => l.City == id)
                 .ToListAsync();
 
+            // unknown city -> just go home instead of showing an empty page
             if (!locations.Any()) return RedirectToAction("Index");
 
             ViewBag.CityName = id;

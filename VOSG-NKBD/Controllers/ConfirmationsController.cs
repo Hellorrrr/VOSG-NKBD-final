@@ -7,6 +7,8 @@ using VOSG_NKBD.Models;
 
 namespace VOSG_NKBD.Controllers
 {
+    // handles the whole booking process: book -> confirm -> receipt -> cancel
+    // [Authorize] = have to be logged in for everything in here
     [Authorize]
     public class ConfirmationsController : Controller
     {
@@ -24,12 +26,15 @@ namespace VOSG_NKBD.Controllers
             var user = await _userManager.GetUserAsync(User);
             var isAdmin = User.IsInRole("Admin");
 
+            // Include() loads the related tables in the same query,
+            // otherwise Place/Payment would just be null in the view
             var query = _context.Confirmations
                 .Include(c => c.Place).ThenInclude(p => p!.Location)
                 .Include(c => c.User)
                 .Include(c => c.Payment)
                 .AsQueryable();
 
+            // members can only see their own bookings, admin sees everything
             if (!isAdmin)
                 query = query.Where(c => c.MemberId == user!.Id);
 
@@ -47,7 +52,7 @@ namespace VOSG_NKBD.Controllers
             var model = new Confirmation
             {
                 PlaceID = place.PlaceID,
-                StartTime = DateTime.Today.AddHours(9),
+                StartTime = DateTime.Today.AddHours(9),   // default 9am-5pm so the form isnt empty
                 EndTime = DateTime.Today.AddHours(17),
                 TotalPrice = place.Price,
                 Place = place
@@ -64,13 +69,17 @@ namespace VOSG_NKBD.Controllers
             if (place == null) return NotFound();
 
             confirmation.Place = place;
+
+            // these fields get filled in by the server later, not by the form.
+            // if I dont remove them ModelState is always invalid and the booking
+            // never goes through (this bug took me ages to find)
             ModelState.Remove("MemberId");
             ModelState.Remove("Place");
             ModelState.Remove("User");
             ModelState.Remove("Payment");
 
             if (ModelState.IsValid)
-                return View("Confirm", confirmation);
+                return View("Confirm", confirmation);   // nothing saved yet, just a preview page
 
             return View(confirmation);
         }
@@ -90,15 +99,14 @@ namespace VOSG_NKBD.Controllers
             ModelState.Remove("User");
             ModelState.Remove("Payment");
 
-            
             if (confirmation.EndTime <= confirmation.StartTime)
                 ModelState.AddModelError("EndTime", "End time must be after start time.");
 
-            
             if (confirmation.StartTime < DateTime.Now)
                 ModelState.AddModelError("StartTime", "Start time cannot be in the past.");
 
-            
+            // double booking check. two bookings overlap when
+            // our start is before their end AND our end is after their start
             var hasConflict = await _context.Confirmations
                 .Where(c => c.PlaceID == confirmation.PlaceID)
                 .AnyAsync(c => confirmation.StartTime < c.EndTime
@@ -110,12 +118,14 @@ namespace VOSG_NKBD.Controllers
             if (!ModelState.IsValid)
                 return View(confirmation);
 
+            // set these on the server so the user cant tamper with them
+            // (e.g. changing the price in dev tools before posting)
             confirmation.MemberId = user!.Id;
             confirmation.ConfirmationDate = DateTime.Today;
             confirmation.TotalPrice = place.Price;
 
             _context.Confirmations.Add(confirmation);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();   // save first so ConfirmationID exists for the payment FK
 
             var payment = new Payment
             {
@@ -141,6 +151,7 @@ namespace VOSG_NKBD.Controllers
                 .FirstOrDefaultAsync(c => c.ConfirmationID == id);
             if (conf == null) return NotFound();
 
+            // stops people viewing someone elses receipt by changing the id in the url
             var user = await _userManager.GetUserAsync(User);
             var isAdmin = User.IsInRole("Admin");
             if (!isAdmin && conf.MemberId != user!.Id)
@@ -164,6 +175,7 @@ namespace VOSG_NKBD.Controllers
             if (!isAdmin && confirmation.MemberId != user!.Id)
                 return Forbid();
 
+            // payment has a FK to the confirmation so it has to be deleted first
             if (confirmation.Payment != null)
                 _context.Payments.Remove(confirmation.Payment);
 

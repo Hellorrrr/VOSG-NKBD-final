@@ -6,6 +6,7 @@ using VOSG_NKBD.Models;
 
 namespace VOSG_NKBD.Controllers
 {
+    // CRUD for locations - anyone can view, only admins can create/edit/delete
     public class LocationsController : Controller
     {
         private readonly AppDbContext _context;
@@ -15,13 +16,18 @@ namespace VOSG_NKBD.Controllers
             _context = context;
         }
 
+        // search + sort + paging all happen in this one action
         public async Task<IActionResult> Index(string? searchString, int? pageNumber, string? currentFilter, string? sortOrder)
         {
+            // these get used by the column header links in the view -
+            // clicking Name toggles between a-z and z-a
             ViewData["NameSort"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["CitySort"] = sortOrder == "city" ? "city_desc" : "city";
             ViewData["CurrentFilter"] = searchString ?? currentFilter;
             ViewData["CurrentSort"] = sortOrder;
 
+            // new search = jump back to page 1, otherwise keep the old
+            // filter when moving between pages (currentFilter carries it over)
             if (searchString != null) pageNumber = 1;
             else searchString = currentFilter;
 
@@ -41,6 +47,7 @@ namespace VOSG_NKBD.Controllers
                 _ => locations.OrderBy(l => l.LocationName),
             };
 
+            // AsNoTracking = faster because we're only reading, not editing
             return View(await PaginatedList<Location>.CreateAsync(locations.AsNoTracking(), pageNumber ?? 1, 10));
         }
 
@@ -57,6 +64,7 @@ namespace VOSG_NKBD.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create() => View();
 
+        // Bind() whitelists the fields so nobody can post extra ones (overposting)
         [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(
             [Bind("LocationName,Address,Suburb,City,Country,PostalCode,PhoneNumber")] Location location)
@@ -90,6 +98,7 @@ namespace VOSG_NKBD.Controllers
                 try { _context.Update(location); await _context.SaveChangesAsync(); }
                 catch (DbUpdateConcurrencyException)
                 {
+                    // happens if someone deleted the location while we were editing it
                     if (!_context.Locations.Any(l => l.LocationsID == id)) return NotFound();
                     throw;
                 }
@@ -108,6 +117,8 @@ namespace VOSG_NKBD.Controllers
             return View(location);
         }
 
+        // ActionName("Delete") because this method cant also be called Delete
+        // (same name + same parameters as the GET one isnt allowed)
         [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

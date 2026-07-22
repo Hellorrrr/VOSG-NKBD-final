@@ -1,22 +1,28 @@
-﻿@model VOSG_NKBD.Models.Confirmation
+﻿@* final step of the booking flow - success page / receipt
+   shown right after Confirm saves the booking and payment *@
+@model VOSG_NKBD.Models.Confirmation
 @{
     ViewData["Title"] = "Booking Confirmed!";
 }
 
+@* max-width keeps the receipt narrow and centered like a real receipt *@
 <div class="container py-5" style="max-width:560px;">
     <div class="vosg-card text-center">
         <div style="font-size:3.5rem; margin-bottom:0.5rem;">🎉</div>
         <h2 class="text-success fw-bold">Booking Confirmed!</h2>
         <p class="text-muted mb-4">Thank you! Your venue is booked and payment received.</p>
+        @* the receipt lines - text-start overrides the card's center align *@
         <div class="booking-summary text-start">
             <div class="summary-row"><span>Location</span><strong>@Model.Place?.Location?.LocationName</strong></div>
             <div class="summary-row"><span>Section</span><strong>@Model.Place?.PlaceName</strong></div>
             <div class="summary-row"><span>Start</span><strong>@Model.StartTime.ToString("ddd dd MMM yyyy, HH:mm")</strong></div>
             <div class="summary-row"><span>End</span><strong>@Model.EndTime.ToString("ddd dd MMM yyyy, HH:mm")</strong></div>
+            @* booking ID = the primary key, works as a receipt number *@
             <div class="summary-row"><span>Booking ID</span><strong>#@Model.ConfirmationID</strong></div>
             <div class="summary-row"><span>Payment</span><span class="badge-paid">@Model.Payment?.PaymentStatus</span></div>
             <div class="summary-row summary-total"><span>Total Paid</span><strong>$@Model.TotalPrice.ToString("N2") NZD</strong></div>
         </div>
+        @* where to go next - bookings list or home *@
         <div class="d-flex gap-2 mt-4">
             <a asp-action="Index" class="btn btn-outline-primary flex-fill">
                 <i class="bi bi-calendar-check me-1"></i>My Bookings

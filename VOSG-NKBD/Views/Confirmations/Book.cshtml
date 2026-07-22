@@ -1,236 +1,114 @@
-﻿@model VOSG_NKBD.Models.Confirmation
+﻿@* details page for ONE location: photo + info table,
+   the bookable spaces underneath, and admin buttons at the bottom *@
+@model VOSG_NKBD.Models.Location
 @{
-    ViewData["Title"] = "Book a Venue";
+    @* browser tab shows the venue's actual name *@
+    ViewData["Title"] = Model.LocationName;
 }
 
 <div class="container py-4">
-    <div class="row g-4 justify-content-center">
-        <div class="col-lg-7">
-            <div class="vosg-card">
-                <h2 class="section-title mb-4">📅 Book a <span>Venue</span></h2>
-                <form asp-action="Book" method="post">
-                    <input type="hidden" asp-for="PlaceID" />
-                    <input type="hidden" asp-for="TotalPrice" />
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                    <div class="mb-3">
-                        <label class="form-label">Location</label>
-                        <input type="text" class="form-control" value="@Model.Place?.Location?.LocationName" readonly />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Section / Place</label>
-                        <input type="text" class="form-control" value="@Model.Place?.PlaceName" readonly />
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Start Time</label>
-                            <input asp-for="StartTime" type="hidden" id="StartTimeHidden" />
-                            <input type="date" class="form-control mb-2" id="StartDate" />
-                            <div class="d-flex gap-2">
-                                <select class="form-select" id="StartHour"></select>
-                                <select class="form-select" id="StartMinute"></select>
-                                <select class="form-select" id="StartAmPm">
-                                    <option value="AM">AM</option>
-                                    <option value="PM">PM</option>
-                                </select>
-                            </div>
-                            <span asp-validation-for="StartTime" class="text-danger small"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">End Time</label>
-                            <input asp-for="EndTime" type="hidden" id="EndTimeHidden" />
-                            <input type="date" class="form-control mb-2" id="EndDate" />
-                            <div class="d-flex gap-2">
-                                <select class="form-select" id="EndHour"></select>
-                                <select class="form-select" id="EndMinute"></select>
-                                <select class="form-select" id="EndAmPm">
-                                    <option value="AM">AM</option>
-                                    <option value="PM">PM</option>
-                                </select>
-                            </div>
-                            <span asp-validation-for="EndTime" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="mb-3 mt-3">
-                        <label class="form-label">City</label>
-                        <input type="text" class="form-control" value="@Model.Place?.Location?.City" readonly />
-                    </div>
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary flex-fill">
-                            <i class="bi bi-arrow-right-circle me-1"></i>Continue to Confirm
-                        </button>
-                        <a asp-controller="Locations" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <h1 class="section-title mb-0">📍 <span>@Model.LocationName</span></h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @* left column: big photo (first place's image, or the default) *@
+        <div class="col-lg-5">
+            @{
+                var img = Model.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
+            }
+
+            <img src="@img" alt="@Model.LocationName"
+                 class="w-100 h-100 rounded shadow-sm" style="object-fit:cover;" />
         </div>
-        <div class="col-lg-4">
-            <div class="booking-summary">
-                @if (!string.IsNullOrEmpty(Model.Place?.ImageUrl))
-                {
-                    <img src="@Model.Place.ImageUrl" alt="@Model.Place.PlaceName"
-                         style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:1rem;" />
-                }
-                else
-                {
-                    <div style="background:linear-gradient(135deg,var(--primary),var(--accent));height:160px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
-                        <i class="bi bi-building text-white" style="font-size:3rem;"></i>
-                    </div>
-                }
-                <h5 class="fw-bold mb-3">Booking Summary</h5>
-                <div class="summary-row"><span>Location</span><strong>@Model.Place?.Location?.LocationName</strong></div>
-                <div class="summary-row"><span>Section</span><strong>@Model.Place?.PlaceName</strong></div>
-                <div class="summary-row"><span>City</span><strong>@Model.Place?.Location?.City</strong></div>
-                <div class="summary-row summary-total"><span>Total Price</span><strong>$@Model.Place?.Price.ToString("N2") NZD</strong></div>
+        @* right column: all the location fields in a definition list *@
+        <div class="col-lg-7">
+            <div class="vosg-card h-100">
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Location Details</h5>
+                @* dl/dt/dd = label + value pairs, bootstrap's row/col splits them 4/8 *@
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Location Name</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.LocationName</dd>
+
+                    <dt class="col-sm-4 text-muted">Address</dt>
+                    <dd class="col-sm-8">@Model.Address</dd>
+
+                    <dt class="col-sm-4 text-muted">Suburb</dt>
+                    <dd class="col-sm-8">@Model.Suburb</dd>
+
+                    <dt class="col-sm-4 text-muted">City</dt>
+                    <dd class="col-sm-8">@Model.City</dd>
+
+                    <dt class="col-sm-4 text-muted">Country</dt>
+                    <dd class="col-sm-8">@Model.Country</dd>
+
+                    <dt class="col-sm-4 text-muted">Postal Code</dt>
+                    <dd class="col-sm-8">@Model.PostalCode</dd>
+
+                    <dt class="col-sm-4 text-muted">Phone Number</dt>
+                    <dd class="col-sm-8">@Model.PhoneNumber</dd>
+                </dl>
             </div>
         </div>
     </div>
+
+    @* the bookable spaces at this location - section hidden if there are none *@
+    @if (Model.Places?.Any() == true)
+    {
+        <div class="mt-5">
+            <h2 class="section-title">🏛️ Available <span>Spaces</span></h2>
+            <div class="row g-4">
+                @foreach (var place in Model.Places!)
+                {
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="vosg-card h-100 d-flex flex-column">
+                            @if (!string.IsNullOrEmpty(place.ImageUrl))
+                            {
+                                <div class="loc-card-img mb-3" style="border-radius:8px;">
+                                    <img src="@place.ImageUrl" alt="@place.PlaceName" />
+                                </div>
+                            }
+                            <div class="fw-bold fs-5 mb-1">@place.PlaceName</div>
+                            @* ?? = fallback text if the place has no description *@
+                            <div class="text-muted small mb-3">@(place.Description ?? "A premium venue space ready for your event.")</div>
+                            <div class="fw-bold text-primary fs-5 mb-3">$@place.Price.ToString("N2") <span class="text-muted fs-6 fw-normal">NZD / session</span></div>
+                            <div class="mt-auto">
+                                @* logged in -> Book button, guest -> sent to login first *@
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <a asp-controller="Confirmations" asp-action="Book" asp-route-id="@place.PlaceID"
+                                       class="btn btn-primary w-100">
+                                        <i class="bi bi-calendar-plus me-1"></i>Book This Space
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-area="Identity" asp-page="/Account/Login"
+                                       class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>Login to Book
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @* admin-only edit/delete shortcuts at the bottom of the page *@
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mt-4 d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.LocationsID" class="btn btn-outline-secondary">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.LocationsID" class="btn btn-outline-danger">
+                <i class="bi bi-trash me-1"></i>Delete
+            </a>
+        </div>
+    }
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        function fillHourOptions(selectEl) {
-            const placeholder = document.createElement('option');
-            placeholder.value = '';
-            placeholder.textContent = 'HH';
-            placeholder.disabled = true;
-            selectEl.appendChild(placeholder);
-            for (let h = 1; h <= 12; h++) {
-                const opt = document.createElement('option');
-                opt.value = String(h).padStart(2, '0');
-                opt.textContent = String(h).padStart(2, '0');
-                selectEl.appendChild(opt);
-            }
-        }
-        function fillMinuteOptions(selectEl) {
-            const placeholder = document.createElement('option');
-            placeholder.value = '';
-            placeholder.textContent = 'MM';
-            placeholder.disabled = true;
-            selectEl.appendChild(placeholder);
-            for (let m = 0; m < 60; m += 5) {
-                const opt = document.createElement('option');
-                opt.value = String(m).padStart(2, '0');
-                opt.textContent = String(m).padStart(2, '0');
-                selectEl.appendChild(opt);
-            }
-        }
-
-        function initTimePicker(prefix, isoValue) {
-            const dateEl = document.getElementById(prefix + 'Date');
-            const hourEl = document.getElementById(prefix + 'Hour');
-            const minuteEl = document.getElementById(prefix + 'Minute');
-            const ampmEl = document.getElementById(prefix + 'AmPm');
-
-            fillHourOptions(hourEl);
-            fillMinuteOptions(minuteEl);
-
-            const todayStr = new Date().toISOString().slice(0, 10);
-            dateEl.min = todayStr;
-
-            if (isoValue) {
-                const d = new Date(isoValue);
-                const yyyy = d.getFullYear();
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const dd = String(d.getDate()).padStart(2, '0');
-                dateEl.value = `${yyyy}-${mm}-${dd}`;
-
-                let h24 = d.getHours();
-                const ampm = h24 >= 12 ? 'PM' : 'AM';
-                let h12 = h24 % 12;
-                if (h12 === 0) h12 = 12;
-
-                hourEl.value = String(h12).padStart(2, '0');
-                minuteEl.value = String(Math.round(d.getMinutes() / 5) * 5 % 60).padStart(2, '0');
-                ampmEl.value = ampm;
-            }
-        }
-
-        function readDateTime(prefix) {
-            const dateEl = document.getElementById(prefix + 'Date');
-            const hourEl = document.getElementById(prefix + 'Hour');
-            const minuteEl = document.getElementById(prefix + 'Minute');
-            const ampmEl = document.getElementById(prefix + 'AmPm');
-
-            if (!dateEl.value || !hourEl.value || !minuteEl.value) return null;
-
-            let h12 = parseInt(hourEl.value, 10);
-            let h24 = h12 % 12;
-            if (ampmEl.value === 'PM') h24 += 12;
-
-            return new Date(`${dateEl.value}T${String(h24).padStart(2, '0')}:${minuteEl.value}:00`);
-        }
-
-        function syncHidden(prefix) {
-            const hiddenEl = document.getElementById(prefix + 'TimeHidden');
-            const d = readDateTime(prefix);
-            if (!d) return;
-
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const mi = String(d.getMinutes()).padStart(2, '0');
-            hiddenEl.value = `${yyyy}-${mm}-${dd}T${hh}:${mi}:00`;
-        }
-
-        function showError(message) {
-            let box = document.getElementById('clientValidationBox');
-            if (!box) {
-                box = document.createElement('div');
-                box.id = 'clientValidationBox';
-                box.className = 'alert alert-danger';
-                const form = document.querySelector('form');
-                form.insertBefore(box, form.firstChild);
-            }
-            box.textContent = message;
-            box.style.display = 'block';
-        }
-
-        function clearError() {
-            const box = document.getElementById('clientValidationBox');
-            if (box) box.style.display = 'none';
-        }
-
-        initTimePicker('Start', '@Model.StartTime.ToString("yyyy-MM-ddTHH:mm:ss")');
-        initTimePicker('End', '@Model.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")');
-        syncHidden('Start');
-        syncHidden('End');
-
-       
-        ['Start', 'End'].forEach(function (prefix) {
-            ['Date', 'Hour', 'Minute', 'AmPm'].forEach(function (suffix) {
-                document.getElementById(prefix + suffix)
-                    .addEventListener('change', function () { syncHidden(prefix); });
-            });
-        });
-
-        document.querySelector('form').addEventListener('submit', function (e) {
-            clearError();
-            syncHidden('Start');
-            syncHidden('End');
-
-            const start = readDateTime('Start');
-            const end = readDateTime('End');
-            const now = new Date();
-
-            if (!start || !end) {
-                e.preventDefault();
-                showError('Please select a complete start time and end time.');
-                return;
-            }
-
-            if (start < now) {
-                e.preventDefault();
-                showError('Start time cannot be in the past.');
-                return;
-            }
-
-            if (end <= start) {
-                e.preventDefault();
-                showError('End time must be after start time.');
-                return;
-            }
-        });
-    </script>
-}

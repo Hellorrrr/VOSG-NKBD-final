@@ -1,17 +1,25 @@
+/* ============================================
+   COLOUR THEME - change the whole site's colours here.
+   these are css variables, everywhere else uses var(--name)
+   so I only need to change a colour in ONE place
+   ============================================ */
 :root {
-    --primary: #2B6CB0;
-    --primary-dk: #1A4A80;
-    --accent: #38B2AC;
-    --accent-lt: #E6FFFA;
-    --gray-100: #F7FAFC;
-    --gray-200: #EDF2F7;
-    --gray-500: #718096;
-    --gray-700: #2D3748;
+    --primary: #2B6CB0; /* main blue - buttons, table headers, prices, logo */
+    --primary-dk: #1A4A80; /* darker blue for hover */
+    --accent: #38B2AC; /* teal - hero gradient, highlights, footer links */
+    --accent-lt: #E6FFFA; /* light teal - table row hover */
+    --gray-100: #F7FAFC; /* page background */
+    --gray-200: #EDF2F7; /* borders + nav link hover */
+    --gray-500: #718096; /* grey secondary text */
+    --gray-700: #2D3748; /* main text colour + footer background */
     --white: #FFFFFF;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08); /* card shadow used everywhere */
+    --radius: 10px; /* rounded corners, bigger number = rounder */
 }
 
+/* ---------- base page setup ---------- */
+
+/* border-box = padding counts inside the width, makes layout maths easier */
 * {
     box-sizing: border-box;
 }
@@ -20,8 +28,9 @@ html {
     height: 100%;
 }
 
+/* flex column layout so the footer sticks to the bottom on short pages */
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', sans-serif; /* site font */
     color: var(--gray-700);
     background: var(--gray-100);
     margin: 0;
@@ -31,10 +40,11 @@ body {
 }
 
 main {
-    flex: 1 0 auto;
+    flex: 1 0 auto; /* main grows to fill space, pushing footer down */
     width: 100%;
 }
 
+/* default colour for all links */
 a {
     color: var(--primary);
     text-decoration: none;
@@ -45,23 +55,27 @@ a {
         text-decoration: underline;
     }
 
+/* ---------- navbar (top menu bar) ---------- */
 .navbar {
-    background: var(--white) !important;
+    background: var(--white) !important; /* !important to override bootstrap */
     box-shadow: var(--shadow);
-    padding: 0.75rem 0;
+    padding: 0.75rem 0; /* controls navbar height */
 }
 
+/* the VOSG logo text top left */
 .navbar-brand {
     font-weight: 800;
-    font-size: 1.35rem;
+    font-size: 1.35rem; /* logo text size */
     color: var(--primary) !important;
     letter-spacing: -0.5px;
 }
 
+    /* the teal coloured part of the brand name */
     .navbar-brand span {
         color: var(--accent);
     }
 
+/* menu links (Home, Locations, Bookings...) */
 .nav-link {
     font-weight: 500;
     color: var(--gray-700) !important;
@@ -78,15 +92,17 @@ a {
         color: var(--primary) !important;
     }
 
+/* ---------- hero = the big gradient banner on the home page ---------- */
 .hero {
+    /* blue to teal gradient - change --primary/--accent to recolour it */
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     color: white;
-    padding: 4rem 0 3.5rem;
+    padding: 4rem 0 3.5rem; /* banner height */
     text-align: center;
 }
 
     .hero h1 {
-        font-size: 2.6rem;
+        font-size: 2.6rem; /* big heading size */
         font-weight: 800;
         margin-bottom: 0.5rem;
     }
@@ -97,12 +113,14 @@ a {
         margin-bottom: 2rem;
     }
 
+/* ---------- search bar inside the hero ---------- */
 .search-bar {
-    display: flex;
-    max-width: 560px;
-    margin: 0 auto;
+    display: flex; /* input and button sit side by side */
+    max-width: 560px; /* total search bar width */
+    margin: 0 auto; /* centres it */
 }
 
+    /* rounded corners only on the left, the button takes the right side */
     .search-bar input {
         flex: 1;
         border: none;
@@ -127,19 +145,21 @@ a {
             background: #122d52;
         }
 
+/* ---------- quick filters = the round city buttons under the search bar ---------- */
 .quick-filters {
     display: flex;
     gap: 0.5rem;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* wraps to a new line on small screens */
     justify-content: center;
     margin-top: 1.25rem;
 }
 
+/* see-through white pills that fill in white on hover */
 .filter-pill {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.2); /* rgba = white at 20% opacity */
     color: white;
     border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 20px;
+    border-radius: 20px; /* big radius = pill shape */
     padding: 0.3rem 1rem;
     font-size: 0.9rem;
     cursor: pointer;
@@ -153,6 +173,7 @@ a {
         text-decoration: none;
     }
 
+/* ---------- section headings like "Featured Locations" ---------- */
 .section-title {
     font-size: 1.5rem;
     font-weight: 700;
@@ -160,29 +181,37 @@ a {
     margin-bottom: 1.25rem;
 }
 
+    /* the teal word inside the heading */
     .section-title span {
         color: var(--accent);
     }
 
+/* ============================================
+   loc-card = the white card that shows ONE location
+   (used on home page + Locations page)
+   loc is short for location
+   ============================================ */
 .loc-card {
     background: var(--white);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    overflow: hidden;
+    overflow: hidden; /* keeps the image inside the rounded corners */
     transition: transform 0.18s, box-shadow 0.18s;
-    height: 100%;
+    height: 100%; /* all cards in a row end up the same height */
     display: flex;
     flex-direction: column;
 }
 
+    /* lift-up effect when hovering a card */
     .loc-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-4px); /* moves it 4px up */
         box-shadow: 0 8px 24px rgba(0,0,0,0.13);
     }
 
+/* gradient box shown when a location has NO image */
 .loc-card-img-placeholder {
     width: 100%;
-    height: 185px;
+    height: 185px; /* image area height, keep same as .loc-card-img */
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     display: flex;
     align-items: center;
@@ -191,25 +220,28 @@ a {
     font-size: 2.5rem;
 }
 
+/* the photo area at the top of the card */
 .loc-card-img {
     width: 100%;
     height: 185px;
-    overflow: hidden;
+    overflow: hidden; /* needed so the zoom effect doesnt spill out */
 }
 
     .loc-card-img img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: cover; /* crops the photo instead of squashing it */
         object-position: center;
         display: block;
         transition: transform 0.35s ease;
     }
 
+/* slow zoom on the photo when hovering the card */
 .loc-card:hover .loc-card-img img {
     transform: scale(1.06);
 }
 
+/* the text part of the card under the photo */
 .loc-card-body {
     padding: 1.1rem;
     flex: 1;
@@ -217,6 +249,7 @@ a {
     flex-direction: column;
 }
 
+/* location name (bold) */
 .loc-card-title {
     font-weight: 700;
     font-size: 1.05rem;
@@ -224,12 +257,14 @@ a {
     margin-bottom: 0.2rem;
 }
 
+/* the small grey address line under the name */
 .loc-card-sub {
     color: var(--gray-500);
     font-size: 0.88rem;
     margin-bottom: 0.75rem;
 }
 
+/* the blue price text */
 .loc-card-price {
     font-weight: 700;
     color: var(--primary);
@@ -237,12 +272,14 @@ a {
     margin-bottom: 0.75rem;
 }
 
+/* row of buttons (View/Book) - margin-top auto pins it to the bottom */
 .loc-card-footer {
     margin-top: auto;
     display: flex;
     gap: 0.5rem;
 }
 
+/* ---------- "how it works" section on the home page ---------- */
 .how-it-works {
     background: var(--white);
     padding: 3rem 0;
@@ -254,10 +291,11 @@ a {
     padding: 1.5rem;
 }
 
+/* the round numbered circles (1, 2, 3) */
 .step-num {
-    width: 52px;
+    width: 52px; /* circle size */
     height: 52px;
-    border-radius: 50%;
+    border-radius: 50%; /* 50% turns a square into a circle */
     background: linear-gradient(135deg, var(--primary), var(--accent));
     color: white;
     font-size: 1.3rem;
@@ -265,7 +303,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
+    margin: 0 auto 1rem; /* auto = centred horizontally */
 }
 
 .step-card h5 {
@@ -278,13 +316,15 @@ a {
     font-size: 0.9rem;
 }
 
+/* ---------- vosg-table = the list tables (Locations, Bookings) ---------- */
 .vosg-table {
     background: white;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    overflow: hidden;
+    overflow: hidden; /* keeps header corners rounded */
 }
 
+    /* the blue header row */
     .vosg-table thead {
         background: var(--primary);
         color: white;
@@ -296,16 +336,18 @@ a {
             font-weight: 600;
         }
 
+    /* light teal highlight when hovering a row */
     .vosg-table tbody tr:hover {
         background: var(--accent-lt);
     }
 
     .vosg-table td {
         vertical-align: middle;
-        padding: 0.75rem 1rem;
+        padding: 0.75rem 1rem; /* controls row height */
         border-color: var(--gray-200);
     }
 
+/* the clickable column sort links in the blue table header */
 .sort-link {
     color: white !important;
     font-weight: 600;
@@ -316,6 +358,7 @@ a {
         text-decoration: none;
     }
 
+/* ---------- buttons - overriding bootstrap's default blue with ours ---------- */
 .btn-primary {
     background: var(--primary);
     border-color: var(--primary);
@@ -336,6 +379,7 @@ a {
         color: white;
     }
 
+/* ---------- vosg-card = generic white box on details/form pages ---------- */
 .vosg-card {
     background: white;
     border-radius: var(--radius);
@@ -343,6 +387,7 @@ a {
     padding: 1.75rem;
 }
 
+/* teal glow around form inputs when clicked, matches the theme */
 .form-control:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 0.2rem rgba(56,178,172,0.25);
@@ -354,21 +399,25 @@ a {
     color: var(--gray-700);
 }
 
+/* ---------- login / register pages ---------- */
+
+/* centres the login box in the middle of the screen */
 .auth-wrapper {
-    min-height: 80vh;
+    min-height: 80vh; /* 80% of the screen height */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
 }
 
+/* the white login/register box itself */
 .auth-card {
     background: white;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 2.5rem;
     width: 100%;
-    max-width: 420px;
+    max-width: 420px; /* login box width */
 }
 
     .auth-card h1 {
@@ -384,24 +433,28 @@ a {
         margin-bottom: 1.5rem;
     }
 
+/* ---------- booking summary box on the Confirm + Receipt pages ---------- */
 .booking-summary {
     background: var(--gray-100);
     border-radius: var(--radius);
     padding: 1.5rem;
 }
 
+/* one row of the summary: label on the left, value on the right */
 .summary-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* pushes label and value apart */
     padding: 0.4rem 0;
     border-bottom: 1px solid var(--gray-200);
     font-size: 0.92rem;
 }
 
+    /* no line under the last row */
     .summary-row:last-child {
         border-bottom: none;
     }
 
+/* the big total price at the bottom */
 .summary-total {
     font-size: 1.2rem;
     font-weight: 800;
@@ -409,6 +462,8 @@ a {
     margin-top: 0.5rem;
 }
 
+/* ---------- payment status badges ---------- */
+/* green = paid */
 .badge-paid {
     background: #C6F6D5;
     color: #22543D;
@@ -418,6 +473,7 @@ a {
     font-weight: 600;
 }
 
+/* yellow = pending */
 .badge-pending {
     background: #FEFCBF;
     color: #744210;
@@ -427,6 +483,7 @@ a {
     font-weight: 600;
 }
 
+/* the green "Booking confirmed!" message boxes */
 .alert-success {
     background: #C6F6D5;
     border: none;
@@ -434,6 +491,7 @@ a {
     border-radius: var(--radius);
 }
 
+/* ---------- pagination (page number buttons under the tables) ---------- */
 .page-link {
     color: var(--primary);
 }
@@ -443,24 +501,31 @@ a {
     border-color: var(--primary);
 }
 
+/* ---------- footer ---------- */
 footer {
-    background: var(--gray-700);
+    background: var(--gray-700); /* dark footer background */
     color: #A0AEC0;
     padding: 1.5rem 0;
     text-align: center;
     font-size: 0.88rem;
-    flex-shrink: 0;
+    flex-shrink: 0; /* footer keeps its size, doesnt get squashed */
 }
 
     footer a {
         color: var(--accent);
     }
 
+/* ============================================
+   MOBILE - phones under 576px wide.
+   media query = these rules only apply on small screens
+   ============================================ */
 @media (max-width: 576px) {
+    /* smaller hero heading so it fits */
     .hero h1 {
         font-size: 1.8rem;
     }
 
+    /* stack the search input on top of the button instead of side by side */
     .search-bar {
         flex-direction: column;
     }
