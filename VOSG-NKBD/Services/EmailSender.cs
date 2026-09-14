@@ -17,14 +17,16 @@ namespace VOSG_NKBD.Services
         {
             var settings = _config.GetSection("EmailSettings");
 
-            var client = new SmtpClient(settings["SmtpServer"])
+            // wrapped these in using - SmtpClient and MailMessage both hold onto
+            // unmanaged resources and were never getting disposed before
+            using var client = new SmtpClient(settings["SmtpServer"])
             {
                 Port = int.Parse(settings["Port"]!),
                 Credentials = new NetworkCredential(settings["Username"], settings["Password"]),
                 EnableSsl = true,
             };
 
-            var mail = new MailMessage
+            using var mail = new MailMessage
             {
                 From = new MailAddress(settings["From"]!, "VOSG-NKBD"),
                 Subject = subject,

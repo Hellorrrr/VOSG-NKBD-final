@@ -1,0 +1,98 @@
+﻿@model VOSG_NKBD.Data.PaginatedList<VOSG_NKBD.Models.Place>
+@{
+    ViewData["Title"] = "Manage Spaces";
+    var filter = ViewData["CurrentFilter"]?.ToString();
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="section-title mb-0">🏛️ Space <span>Management</span></h1>
+            <small class="text-muted">@Model.Count total results</small>
+        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>+ Add Space
+            </a>
+        }
+    </div>
+
+    <form method="get" class="mb-4">
+        <div class="input-group" style="max-width:420px;">
+            <input type="text" name="searchString" value="@filter"
+                   class="form-control" placeholder="Search by space or location name…" />
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+            @if (!string.IsNullOrEmpty(filter))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x"></i></a>
+            }
+        </div>
+    </form>
+
+    <div class="vosg-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Space Name</th>
+                    <th>Location</th>
+                    <th>Price (NZD)</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var place in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@place.PlaceName</td>
+                        <td>@place.Location?.LocationName</td>
+                        <td>$@place.Price.ToString("N2")</td>
+                        <td class="text-center">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a asp-action="Edit" asp-route-id="@place.PlaceID"
+                                       class="btn btn-sm btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@place.PlaceID"
+                                       class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="4" class="text-center text-muted py-4">No spaces found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-currentFilter="@filter">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-currentFilter="@filter">@i</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-currentFilter="@filter">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

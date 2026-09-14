@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -11,30 +12,30 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VOSG_NKBD.styles.css" asp-append-version="true" />
     <style>
-        .nav-right {
-        display: flex;
-        align-items: center;
-        gap: 36px;
-        }
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 36px;
+            }
 
-        .nav-right a {
-        font-size: 15px;
-        text-decoration: none;
-        color: #333;
-        }
+                .nav-right a {
+                    font-size: 15px;
+                    text-decoration: none;
+                    color: #333;
+                }
 
-        .btn-login {
-        background: #1a3a6b;
-        color: white !important;
-        border-radius: 6px;
-        padding: 6px 22px;
-        font-size: 15px;
-        }
+            .btn-login {
+                background: #1a3a6b;
+                color: white !important;
+                border-radius: 6px;
+                padding: 6px 22px;
+                font-size: 15px;
+            }
 
-        .btn-login:hover {
-        background: #142d55;
-        color: white !important;
-        }
+                .btn-login:hover {
+                    background: #142d55;
+                    color: white !important;
+                }
     </style>
 </head>
 <body>
@@ -60,6 +61,10 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <a asp-area="" asp-controller="Confirmations" asp-action="Index">My Bookings</a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-area="" asp-controller="Places" asp-action="Index">Manage Spaces</a>
                         }
 
                         <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -97,23 +102,40 @@
             <span>@TempData["Success"]</span>
         </div>
         <style>
-            @@keyframes slideIn {
-            from {
-            opacity: 0;
-            transform: translateY(20px);
-            }
+                @@keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
 
-            to {
-            opacity: 1;
-            transform: translateY(0);
-            }
-            }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
         </style>
         <script>
-            setTimeout(function() {
-            var t = document.getElementById('successToast');
-            if (t) { t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(function(){t.remove();},400); }
-            }, 3500);
+                setTimeout(function() {
+                    var t = document.getElementById('successToast');
+                    if (t) { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }
+                }, 3500);
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div id="errorToast" style="position:fixed;bottom:2rem;right:2rem;z-index:9999;
+            background:#742A2A;color:#fff;border-radius:10px;padding:1rem 1.5rem;
+            box-shadow:0 4px 20px rgba(0,0,0,0.2);display:flex;align-items:center;gap:0.75rem;
+            animation:slideIn 0.4s ease;">
+            <i class="bi bi-exclamation-triangle-fill" style="font-size:1.3rem;"></i>
+            <span>@TempData["Error"]</span>
+        </div>
+        <script>
+                setTimeout(function() {
+                    var t = document.getElementById('errorToast');
+                    if (t) { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }
+                }, 4500);
         </script>
     }
 

@@ -1,0 +1,37 @@
+﻿@model VOSG_NKBD.Models.Place
+@{
+    ViewData["Title"] = "Delete Space";
+}
+
+<div class="container py-4" style="max-width:560px;">
+    <div class="vosg-card">
+        <div class="text-center mb-4">
+            <div style="font-size:3rem;">⚠️</div>
+            <h2 class="section-title mb-1">Delete <span>Space</span></h2>
+            <p class="text-muted">Are you sure you want to delete this space? This action cannot be undone.</p>
+        </div>
+
+        <div class="p-3 rounded mb-4" style="background:var(--gray-100); border-left: 4px solid #E53E3E;">
+            <div class="row g-1">
+                <div class="col-5 text-muted small">Space Name</div>
+                <div class="col-7 fw-bold">@Model.PlaceName</div>
+                <div class="col-5 text-muted small">Location</div>
+                <div class="col-7">@Model.Location?.LocationName</div>
+                <div class="col-5 text-muted small">Price</div>
+                <div class="col-7">$@Model.Price.ToString("N2") NZD</div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="PlaceID" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger flex-fill">
+                    <i class="bi bi-trash me-1"></i>Yes, Delete
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                    <i class="bi bi-x me-1"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

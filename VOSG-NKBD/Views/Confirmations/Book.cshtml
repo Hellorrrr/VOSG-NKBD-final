@@ -1,114 +1,78 @@
 ﻿@* details page for ONE location: photo + info table,
    the bookable spaces underneath, and admin buttons at the bottom *@
-@model VOSG_NKBD.Models.Location
+@model VOSG_NKBD.Models.Confirmation
 @{
-    @* browser tab shows the venue's actual name *@
-    ViewData["Title"] = Model.LocationName;
+    ViewData["Title"] = "Book " + Model.Place?.PlaceName;
 }
 
 <div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <h1 class="section-title mb-0">📍 <span>@Model.LocationName</span></h1>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i>Back to List
-        </a>
-    </div>
-
-    <div class="row g-4">
-        @* left column: big photo (first place's image, or the default) *@
-        <div class="col-lg-5">
-            @{
-                var img = Model.Places?.FirstOrDefault()?.ImageUrl ?? "/images/hall-auckland.jpg";
-            }
-
-            <img src="@img" alt="@Model.LocationName"
-                 class="w-100 h-100 rounded shadow-sm" style="object-fit:cover;" />
-        </div>
-        @* right column: all the location fields in a definition list *@
+    <div class="row g-4 justify-content-center">
         <div class="col-lg-7">
-            <div class="vosg-card h-100">
-                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Location Details</h5>
-                @* dl/dt/dd = label + value pairs, bootstrap's row/col splits them 4/8 *@
-                <dl class="row mb-0">
-                    <dt class="col-sm-4 text-muted">Location Name</dt>
-                    <dd class="col-sm-8 fw-semibold">@Model.LocationName</dd>
+            <div class="vosg-card">
+                <h2 class="section-title mb-4">🗓️ Book <span>@Model.Place?.PlaceName</span></h2>
+                <p class="text-muted mb-4">Choose your start and end time for this space.</p>
 
-                    <dt class="col-sm-4 text-muted">Address</dt>
-                    <dd class="col-sm-8">@Model.Address</dd>
+                <div asp-validation-summary="All" class="alert alert-danger"
+                     style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
 
-                    <dt class="col-sm-4 text-muted">Suburb</dt>
-                    <dd class="col-sm-8">@Model.Suburb</dd>
+                <form asp-action="Book" method="post">
+                    @* using plain name= instead of asp-for here on purpose - asp-for kept
+                       rendering the datetime in a format the datetime-local input didnt like,
+                       easier to just control the string myself *@
+                    <input type="hidden" name="PlaceID" value="@Model.PlaceID" />
+                    <input type="hidden" name="TotalPrice" value="@Model.TotalPrice" />
 
-                    <dt class="col-sm-4 text-muted">City</dt>
-                    <dd class="col-sm-8">@Model.City</dd>
-
-                    <dt class="col-sm-4 text-muted">Country</dt>
-                    <dd class="col-sm-8">@Model.Country</dd>
-
-                    <dt class="col-sm-4 text-muted">Postal Code</dt>
-                    <dd class="col-sm-8">@Model.PostalCode</dd>
-
-                    <dt class="col-sm-4 text-muted">Phone Number</dt>
-                    <dd class="col-sm-8">@Model.PhoneNumber</dd>
-                </dl>
-            </div>
-        </div>
-    </div>
-
-    @* the bookable spaces at this location - section hidden if there are none *@
-    @if (Model.Places?.Any() == true)
-    {
-        <div class="mt-5">
-            <h2 class="section-title">🏛️ Available <span>Spaces</span></h2>
-            <div class="row g-4">
-                @foreach (var place in Model.Places!)
-                {
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="vosg-card h-100 d-flex flex-column">
-                            @if (!string.IsNullOrEmpty(place.ImageUrl))
-                            {
-                                <div class="loc-card-img mb-3" style="border-radius:8px;">
-                                    <img src="@place.ImageUrl" alt="@place.PlaceName" />
-                                </div>
-                            }
-                            <div class="fw-bold fs-5 mb-1">@place.PlaceName</div>
-                            @* ?? = fallback text if the place has no description *@
-                            <div class="text-muted small mb-3">@(place.Description ?? "A premium venue space ready for your event.")</div>
-                            <div class="fw-bold text-primary fs-5 mb-3">$@place.Price.ToString("N2") <span class="text-muted fs-6 fw-normal">NZD / session</span></div>
-                            <div class="mt-auto">
-                                @* logged in -> Book button, guest -> sent to login first *@
-                                @if (User.Identity?.IsAuthenticated == true)
-                                {
-                                    <a asp-controller="Confirmations" asp-action="Book" asp-route-id="@place.PlaceID"
-                                       class="btn btn-primary w-100">
-                                        <i class="bi bi-calendar-plus me-1"></i>Book This Space
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a asp-area="Identity" asp-page="/Account/Login"
-                                       class="btn btn-outline-primary w-100">
-                                        <i class="bi bi-box-arrow-in-right me-1"></i>Login to Book
-                                    </a>
-                                }
-                            </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <label class="form-label">Start Time</label>
+                            <input type="datetime-local" name="StartTime" class="form-control"
+                                   value="@Model.StartTime.ToString("yyyy-MM-ddTHH:mm")" required />
+                            <span asp-validation-for="StartTime" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">End Time</label>
+                            <input type="datetime-local" name="EndTime" class="form-control"
+                                   value="@Model.EndTime.ToString("yyyy-MM-ddTHH:mm")" required />
+                            <span asp-validation-for="EndTime" class="text-danger small"></span>
                         </div>
                     </div>
-                }
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-arrow-right-circle me-1"></i>Continue to Confirm
+                        </button>
+                        <a asp-controller="Locations" asp-action="Details"
+                           asp-route-id="@Model.Place?.LocationsID" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Back
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
-    }
 
-    @* admin-only edit/delete shortcuts at the bottom of the page *@
-    @if (User.IsInRole("Admin"))
-    {
-        <div class="mt-4 d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.LocationsID" class="btn btn-outline-secondary">
-                <i class="bi bi-pencil me-1"></i>Edit
-            </a>
-            <a asp-action="Delete" asp-route-id="@Model.LocationsID" class="btn btn-outline-danger">
-                <i class="bi bi-trash me-1"></i>Delete
-            </a>
+        @* same summary card style as Confirm.cshtml so the two pages dont look disconnected *@
+        <div class="col-lg-4">
+            <div class="booking-summary">
+                @if (!string.IsNullOrEmpty(Model.Place?.ImageUrl))
+                {
+                    <img src="@Model.Place.ImageUrl" alt="@Model.Place.PlaceName"
+                         style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:1rem;" />
+                }
+                else
+                {
+                    <div style="background:linear-gradient(135deg,var(--primary),var(--accent));height:160px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                        <i class="bi bi-building text-white" style="font-size:3rem;"></i>
+                    </div>
+                }
+                <h5 class="fw-bold mb-3">Booking Summary</h5>
+                <div class="summary-row"><span>Location</span><strong>@Model.Place?.Location?.LocationName</strong></div>
+                <div class="summary-row"><span>Section</span><strong>@Model.Place?.PlaceName</strong></div>
+                <div class="summary-row summary-total"><span>Price</span><strong>$@Model.Place?.Price.ToString("N2") NZD</strong></div>
+            </div>
         </div>
-    }
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
