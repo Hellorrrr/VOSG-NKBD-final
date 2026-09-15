@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace VOSG_NKBD.Views.Confirmations
+namespace VOSG_NKBD.Views.Admin
 {
-    public class ConfirmModel : PageModel
+    public class DashboardModel : PageModel
     {
         public void OnGet()
         {

@@ -6,15 +6,15 @@
     var cityData = new Dictionary<string, (string img, string tagline, string sub)>(StringComparer.OrdinalIgnoreCase)
     {
         ["Auckland"] = ("/images/auckland-city.jpg", "AUCKLAND", "Auckland is the largest city in New Zealand and is often called the \"City of Sails\""),
-        ["Toronto"] = ("/images/toronto-city.jpg", "TORONTO", "Toronto is Canada's most vibrant metropolis, a city of towers and waterfront wonder"),
-        ["Orlando"] = ("/images/orlando-city.jpg", "ORLANDO", "Orlando is the entertainment capital of the world, where imagination never sleeps"),
-        ["Melbourne"] = ("/images/melbourne-city.jpg", "MELBOURNE", "Melbourne is Australia's cultural heartbeat, celebrated for its art, coffee, and creativity"),
-        ["Helsinki"] = ("/images/helsinki-city.jpg", "HELSINKI", "Helsinki is a Nordic gem of design and nature, where the Baltic Sea meets the sky"),
-        ["Ho Chi Minh City"] = ("/images/hcmc-city.jpg", "HO CHI MINH CITY", "Ho Chi Minh City is Vietnam's dynamic economic heart, where tradition meets modern ambition"),
+        ["Toronto"] = ("/images/toronto-city.jpg", "TORONTO", "Toronto sits on the shore of Lake Ontario and is Canada's largest city, known for its mix of glass towers and old neighbourhoods"),
+        ["Orlando"] = ("/images/orlando-city.jpg", "ORLANDO", "Orlando is best known for its theme parks, but the city itself has a growing downtown arts and convention scene"),
+        ["Melbourne"] = ("/images/melbourne-city.jpg", "MELBOURNE", "Melbourne is known for laneway cafes, street art, and a packed calendar of festivals and events"),
+        ["Helsinki"] = ("/images/helsinki-city.jpg", "HELSINKI", "Helsinki sits on the Baltic coast and is known worldwide for clean, functional design"),
+        ["Ho Chi Minh City"] = ("/images/hcmc-city.jpg", "HO CHI MINH CITY", "Ho Chi Minh City is Vietnam's largest city and its commercial center, mixing colonial-era buildings with a fast-growing skyline"),
     };
 
     var (heroImg, heroTitle, heroSub) = cityData.TryGetValue(cityName, out var d)
-        ? d : ("/images/auckland-city.jpg", cityName.ToUpper(), "Discover stunning venues in " + cityName);
+        ? d : ("/images/auckland-city.jpg", cityName.ToUpper(), "Discover venues in " + cityName);
 }
 
 <style>

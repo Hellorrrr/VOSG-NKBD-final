@@ -1,0 +1,64 @@
+﻿@using VOSG_NKBD.Models
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var revenue = (List<LocationRevenueDto>)ViewBag.RevenueByLocation;
+    var popular = (List<PopularPlaceDto>)ViewBag.PopularPlaces;
+}
+
+<div class="container py-4">
+    <h1 class="section-title mb-4">📊 Admin <span>Dashboard</span></h1>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="vosg-card text-center">
+                <div class="text-muted small mb-1">Total Bookings</div>
+                <div class="fs-3 fw-bold text-primary">@ViewBag.TotalBookings</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="vosg-card text-center">
+                <div class="text-muted small mb-1">Total Revenue</div>
+                <div class="fs-3 fw-bold text-primary">$@(((decimal)ViewBag.TotalRevenue).ToString("N2"))</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="vosg-card">
+                <h5 class="fw-bold mb-3">Revenue by Location</h5>
+                <table class="table table-sm">
+                    <thead><tr><th>Location</th><th>Bookings</th><th>Revenue</th></tr></thead>
+                    <tbody>
+                        @foreach (var r in revenue)
+                        {
+                            <tr>
+                                <td>@r.LocationName</td>
+                                <td>@r.BookingCount</td>
+                                <td>$@r.TotalRevenue.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="vosg-card">
+                <h5 class="fw-bold mb-3">Top 5 Most Booked Spaces</h5>
+                <table class="table table-sm">
+                    <thead><tr><th>Space</th><th>Location</th><th>Bookings</th></tr></thead>
+                    <tbody>
+                        @foreach (var p in popular)
+                        {
+                            <tr>
+                                <td>@p.PlaceName</td>
+                                <td>@p.LocationName</td>
+                                <td>@p.BookingCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
